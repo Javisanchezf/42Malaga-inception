@@ -27,7 +27,7 @@ GITIGNORE = .gitignore
 
 #Personal use
 $(GITIGNORE):
-	@echo -e ".*\n*.out\n*.o\n*.a\n*.dSYM">.gitignore
+	@echo -e ".*\n*.out\n*.o\n*.a\n*.dSYM\n!.env\n!.dockerignore" > .gitignore
 	@echo -e "$(GREEN)Creating:$(DEFAULT) Gitignore."
 git: clean $(GITIGNORE)
 	@git add *
