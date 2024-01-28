@@ -30,6 +30,7 @@ $(GITIGNORE):
 	@echo -e "$(GREEN)Creating:$(DEFAULT) Gitignore."
 git: clean $(GITIGNORE)
 	@git add *
+	@git add .env
 	@echo -e "$(BOLD)$(YELLOW)Git:$(WHITE) Adding all archives.$(DEFAULT)"
 	@git commit -m "[$(DATETIME)] - Little changes by $(USER)"
 	@echo -e "$(BOLD)$(CYAN)Git:$(WHITE) Commit this changes \
