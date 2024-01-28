@@ -13,7 +13,7 @@ $(CERTIFICATE):
 	@echo -e "$(GREEN)Created self-signed certificate$(DEFAULT)"
 
 clean:
-	rm $(CERTIFICATE)
+	rm -rf $(CERTIFICATE)
 
 clean_docker:
 	docker stop alpine-nginx
