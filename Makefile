@@ -30,9 +30,9 @@ $(GITIGNORE):
 	@echo -e "$(GREEN)Creating:$(DEFAULT) Gitignore."
 git: clean $(GITIGNORE)
 	@git add *
-	@echo "$(BOLD)$(YELLOW)Git:$(WHITE) Adding all archives.$(DEFAULT)"
+	@echo -e "$(BOLD)$(YELLOW)Git:$(WHITE) Adding all archives.$(DEFAULT)"
 	@git commit -m "[$(DATETIME)] - Little changes by $(USER)"
-	@echo "$(BOLD)$(CYAN)Git:$(WHITE) Commit this changes \
+	@echo -e "$(BOLD)$(CYAN)Git:$(WHITE) Commit this changes \
 	 with "[$(DATETIME)] - Little changes by $(USER)".$(DEFAULT)"
 	@git push
 	@echo -e "$(BOLD)$(GREEN)Git:$(WHITE) Pushing all changes.$(DEFAULT)"
