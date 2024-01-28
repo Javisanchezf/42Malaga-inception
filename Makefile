@@ -13,12 +13,11 @@ $(CERTIFICATE):
 	@echo -e "$(GREEN)Created self-signed certificate$(DEFAULT)"
 
 clean:
-	rm -rf $(CERTIFICATE)
+	@rm -rf $(CERTIFICATE)
+	@docker stop alpine-nginx  || true
+	@docker rm alpine-nginx  || true
+	@docker rmi nginx-tls-alpine  || true
 
-clean_docker:
-	docker stop alpine-nginx
-	docker rm alpine-nginx
-	docker rmi nginx-tls-alpine
 
 # Personal use variables
 DATETIME := $(shell date +%Y-%m-%d' '%H:%M:%S)
