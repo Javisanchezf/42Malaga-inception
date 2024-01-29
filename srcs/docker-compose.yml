@@ -1,0 +1,16 @@
+version: '3.8'
+
+networks:
+  inception:
+    name: inception
+
+services:
+  nginx:
+    container_name: nginx
+    build: ./nginx/.
+    image: nginx-tls-alpine
+    ports:
+      - "443:443"
+    networks:
+      - inception
+    restart: always

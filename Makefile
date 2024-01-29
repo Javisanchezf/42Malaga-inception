@@ -6,21 +6,23 @@ CERTIFICATE = $(CERT) $(KEY)
 all: up
 
 up: $(CERTIFICATE)
-	service docker start
-	docker build -t nginx-tls-alpine srcs/nginx
-	docker run --name alpine-nginx -p 443:443 nginx-tls-alpine
+	@service docker start 2>$(MSSG_DIR)
+	@docker-compose -f ./srcs/docker-compose.yml up
+
+down:
+	@docker-compose -f ./srcs/docker-compose.yml down
 
 $(CERTIFICATE):
 	@openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $(KEY) -out $(CERT) -subj "/C=$(CERT_COUNTRY)/L=$(CERT_LOCATION)/O=$(CERT_ORG)/OU=$(CER_ORG_UNITY)/CN=$(DOMAIN_NAME)"
-	@echo -e "$(GREEN)Created self-signed certificate$(DEFAULT)"
+	@echo -e "$(GREEN)✔$(DEFAULT) Self-signed certificate: $(GREEN)Created$(DEFAULT)"
 
-clean:
-	@rm -rf $(CERTIFICATE); echo -e "Certificates : $(RED)Deleted$(DEFAULT)"
-	@echo -e "Cointainers $$(docker ps -qa | tr '\n' ' '): $(RED)Stopped$(DEFAULT)"; docker stop $$(docker ps -qa) >$(MSSG_DIR) 2>$(MSSG_DIR) || true ;\
-	echo -e "Cointainers $$(docker ps -qa | tr '\n' ' '): $(RED)Deleted$(DEFAULT)"; docker rm $$(docker ps -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
-	echo -e "Images $$(docker images -qa | tr '\n' ' '): $(RED)Deleted$(DEFAULT)"; docker rmi -f $$(docker images -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
-	echo -e "Volumes $$(docker volume ls -q | tr '\n' ' '): $(RED)Deleted$(DEFAULT)"; docker volume rm $$(docker volume ls -q) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
-	echo -e "Networks $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)' | tr ':' ','): $(RED)Deleted$(DEFAULT)"; docker network rm $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)') >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true
+clean: down
+	@rm -rf $(CERTIFICATE); echo -e "$(GREEN)✔$(DEFAULT) Certificates : $(GREEN)Deleted$(DEFAULT)"
+	@echo -e "$(GREEN)✔$(DEFAULT) Cointainers $$(docker ps -qa | tr '\n' ' '): $(GREEN)Stopped$(DEFAULT)"; docker stop $$(docker ps -qa) >$(MSSG_DIR) 2>$(MSSG_DIR) || true ;\
+	echo -e "$(GREEN)✔$(DEFAULT) Cointainers $$(docker ps -qa | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker rm $$(docker ps -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
+	echo -e "$(GREEN)✔$(DEFAULT) Images $$(docker images -qa | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker rmi -f $$(docker images -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
+	echo -e "$(GREEN)✔$(DEFAULT) Volumes $$(docker volume ls -q | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker volume rm $$(docker volume ls -q) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
+	echo -e "$(GREEN)✔$(DEFAULT) Networks $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)' | tr ':' ','): $(GREEN)Deleted$(DEFAULT)"; docker network rm $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)') >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true
 
 # Personal use variables
 DATETIME := $(shell date +%Y-%m-%d' '%H:%M:%S)
@@ -53,4 +55,4 @@ CYAN	:= \033[36;1m
 WHITE	:= \033[37;1m
 DEFAULT	:= \033[0m
 
-.PHONY : all clean fclean re git
+.PHONY : all clean up down git
