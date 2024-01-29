@@ -1,10 +1,12 @@
 include .env
 
+MSSG_DIR=/dev/null
 CERTIFICATE = $(CERT) $(KEY)
 
 all: up
 
 up: $(CERTIFICATE)
+	service docker start
 	docker build -t nginx-tls-alpine srcs/nginx
 	docker run --name alpine-nginx -p 443:443 nginx-tls-alpine
 
@@ -13,11 +15,12 @@ $(CERTIFICATE):
 	@echo -e "$(GREEN)Created self-signed certificate$(DEFAULT)"
 
 clean:
-	@rm -rf $(CERTIFICATE)
-	@docker stop alpine-nginx  || true
-	@docker rm alpine-nginx  || true
-	@docker rmi nginx-tls-alpine  || true
-
+	@rm -rf $(CERTIFICATE); echo -e "Certificates : $(RED)Deleted$(DEFAULT)"
+	@echo -e "Cointainers $$(docker ps -qa | tr '\n' ' '): $(RED)Stopped$(DEFAULT)"; docker stop $$(docker ps -qa) >$(MSSG_DIR) 2>$(MSSG_DIR) || true ;\
+	echo -e "Cointainers $$(docker ps -qa | tr '\n' ' '): $(RED)Deleted$(DEFAULT)"; docker rm $$(docker ps -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
+	echo -e "Images $$(docker images -qa | tr '\n' ' '): $(RED)Deleted$(DEFAULT)"; docker rmi -f $$(docker images -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
+	echo -e "Volumes $$(docker volume ls -q | tr '\n' ' '): $(RED)Deleted$(DEFAULT)"; docker volume rm $$(docker volume ls -q) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
+	echo -e "Networks $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)' | tr ':' ','): $(RED)Deleted$(DEFAULT)"; docker network rm $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)') >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true
 
 # Personal use variables
 DATETIME := $(shell date +%Y-%m-%d' '%H:%M:%S)
