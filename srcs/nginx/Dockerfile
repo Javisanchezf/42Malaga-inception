@@ -1,20 +1,19 @@
-# Utiliza la imagen base Alpine Linux 3.19
+# Use the Alpine Linux 3.19 base image
 FROM alpine:3.19
 
-# Instala NGINX y OpenSSL
+# Install NGINX and OpenSSL
 RUN apk update && apk add nginx openssl
 
-# Crea directorio para almacenar certificados TLS
+# Create a directory to store TLS certificates
 RUN mkdir -p /etc/nginx/certs
 
-# Copia los archivos de configuración
+# Copy configuration files
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY javiersa.42.fr.crt /etc/nginx/certs/javiersa.42.fr.crt
 COPY javiersa.42.fr.key /etc/nginx/certs/javiersa.42.fr.key
 
-# Exponer el puerto 443
+# Expose port 443
 EXPOSE 443
 
-# Iniciar NGINX en primer plano
+# Start NGINX
 CMD ["nginx", "-g", "daemon off;"]
-
