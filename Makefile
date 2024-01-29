@@ -1,12 +1,16 @@
-include .env
-
 MSSG_DIR=/dev/null
 CERTIFICATE = $(CERT) $(KEY)
+DOMAIN_NAME=javiersa.42.fr
+CERT=srcs/nginx/javiersa.42.fr.crt
+KEY=srcs/nginx/javiersa.42.fr.key
+CERT_COUNTRY=ES
+CERT_LOCATION=Malaga
+CERT_ORG=42
+CER_ORG_UNITY=student
 
 all: up
 
 up: $(CERTIFICATE)
-	@service docker start 2>$(MSSG_DIR)
 	@docker-compose -f ./srcs/docker-compose.yml up -d
 
 down:
@@ -35,7 +39,6 @@ $(GITIGNORE):
 	@echo -e "$(GREEN)Creating:$(DEFAULT) Gitignore."
 git: clean $(GITIGNORE)
 	@git add *
-	@git add .env
 	@echo -e "$(BOLD)$(YELLOW)Git:$(WHITE) Adding all archives.$(DEFAULT)"
 	@git commit -m "[$(DATETIME)] - Little changes by $(USER)"
 	@echo -e "$(BOLD)$(CYAN)Git:$(WHITE) Commit this changes \
