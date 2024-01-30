@@ -3,6 +3,7 @@ FROM alpine:3.19
 
 ARG DOMAIN_NAME
 ENV TERM xterm
+ENV DOMAIN_NAME=${DOMAIN_NAME}
 
 # Install NGINX and OpenSSL
 RUN apk update && \
