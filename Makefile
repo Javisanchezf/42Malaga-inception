@@ -25,6 +25,9 @@ up: $(CERTIFICATE)
 down:
 	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml down
 
+logs:
+	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml logs
+
 $(CERTIFICATE):
 	@openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $(KEY) -out $(CRT) -subj "/C=$(CRT_COUNTRY)/L=$(CRT_LOCATION)/O=$(CRT_ORG)/OU=$(CRT_ORG_UNITY)/CN=$(DOMAIN_NAME)"
 	@echo -e "$(GREEN)✔$(DEFAULT) Self-signed certificate: $(GREEN)Created$(DEFAULT)"
