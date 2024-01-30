@@ -1,3 +1,6 @@
+#!/bin/bash
+
+echo "
 worker_processes auto;
 
 events {
@@ -19,5 +22,6 @@ http {
             return 200 '¡Hola, mundo!';
         }
     }
-}
+}" > /etc/nginx/nginx.conf
 
+nginx -g "daemon off;"

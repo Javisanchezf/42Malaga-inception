@@ -1,32 +1,49 @@
-MSSG_DIR=/dev/null
-CERTIFICATE = $(CERT) $(KEY)
+#VARIABLES
+#You can change any of the following parameters with your data and it will continue to work
+#If you change the domain name you must execute "make change_domain" after the change. Be careful, this will change the hosts file.
 DOMAIN_NAME=javiersa.42.fr
-CERT=srcs/nginx/javiersa.42.fr.crt
-KEY=srcs/nginx/javiersa.42.fr.key
-CERT_COUNTRY=ES
-CERT_LOCATION=Malaga
-CERT_ORG=42
-CER_ORG_UNITY=student
+CRT_COUNTRY=ES
+CRT_LOCATION=Malaga
+CRT_ORG=42
+CRT_ORG_UNITY=student
+
+#ROUTES
+NGINX_ROUTE=srcs/nginx
+MSSG_DIR=/dev/null
+
+#SELF SYSTEM
+CRT=$(NGINX_ROUTE)/$(DOMAIN_NAME).crt
+KEY=$(NGINX_ROUTE)/$(DOMAIN_NAME).key
+CERTIFICATE = $(CRT) $(KEY)
+
 
 all: up
 
 up: $(CERTIFICATE)
-	@docker-compose -f ./srcs/docker-compose.yml up -d
+	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml up -d
 
 down:
-	@docker-compose -f ./srcs/docker-compose.yml down
+	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml down
 
 $(CERTIFICATE):
-	@openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $(KEY) -out $(CERT) -subj "/C=$(CERT_COUNTRY)/L=$(CERT_LOCATION)/O=$(CERT_ORG)/OU=$(CER_ORG_UNITY)/CN=$(DOMAIN_NAME)"
+	@openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $(KEY) -out $(CRT) -subj "/C=$(CRT_COUNTRY)/L=$(CRT_LOCATION)/O=$(CRT_ORG)/OU=$(CRT_ORG_UNITY)/CN=$(DOMAIN_NAME)"
 	@echo -e "$(GREEN)✔$(DEFAULT) Self-signed certificate: $(GREEN)Created$(DEFAULT)"
 
 clean: down
 	@rm -rf $(CERTIFICATE); echo -e "$(GREEN)✔$(DEFAULT) Certificates : $(GREEN)Deleted$(DEFAULT)"
+	@rm -rf $(EXECUTION_FILES)
 	@echo -e "$(GREEN)✔$(DEFAULT) Cointainers $$(docker ps -qa | tr '\n' ' '): $(GREEN)Stopped$(DEFAULT)"; docker stop $$(docker ps -qa) >$(MSSG_DIR) 2>$(MSSG_DIR) || true ;\
 	echo -e "$(GREEN)✔$(DEFAULT) Cointainers $$(docker ps -qa | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker rm $$(docker ps -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
 	echo -e "$(GREEN)✔$(DEFAULT) Images $$(docker images -qa | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker rmi -f $$(docker images -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
 	echo -e "$(GREEN)✔$(DEFAULT) Volumes $$(docker volume ls -q | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker volume rm $$(docker volume ls -q) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
 	echo -e "$(GREEN)✔$(DEFAULT) Networks $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)' | tr ':' ','): $(GREEN)Deleted$(DEFAULT)"; docker network rm $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)') >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true
+
+re: clean all
+
+change_domain:
+	@echo "127.0.0.1       localhost.my.domain localhost localhost.localdomain localhost $(DOMAIN_NAME) www.$(DOMAIN_NAME)">/etc/hosts
+	@echo "::1             localhost localhost.localdomain" >> /etc/hosts
+	@echo -e "Domain name changed to: $(GREEN) $(DOMAIN_NAME) $(DEFAULT)"
 
 # Personal use variables
 DATETIME := $(shell date +%Y-%m-%d' '%H:%M:%S)
@@ -58,4 +75,4 @@ CYAN	:= \033[36;1m
 WHITE	:= \033[37;1m
 DEFAULT	:= \033[0m
 
-.PHONY : all clean up down git
+.PHONY : all clean re up down git CRT_DIR
