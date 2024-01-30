@@ -2,9 +2,11 @@
 FROM alpine:3.19
 
 ARG DOMAIN_NAME
+ENV TERM xterm
 
 # Install NGINX and OpenSSL
-RUN apk update && apk add nginx openssl bash
+RUN apk update && \
+    apk add --no-cache nginx openssl bash
 # Create a directory to store TLS certificates
 RUN mkdir -p /etc/nginx/certs
 
