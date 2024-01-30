@@ -17,3 +17,13 @@ services:
     networks:
       - inception
     restart: always
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./mariadb/.
+      # args:
+      #   - DOMAIN_NAME=${DOMAIN_NAME}
+    image: mariadb-alpine
+    networks:
+      - inception
+    restart: always

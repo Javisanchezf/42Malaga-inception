@@ -7,6 +7,7 @@ ENV DOMAIN_NAME=${DOMAIN_NAME}
 
 # Install NGINX and OpenSSL
 RUN apk update && \
+	apk upgrade && \
     apk add --no-cache nginx openssl bash
 # Create a directory to store TLS certificates
 RUN mkdir -p /etc/nginx/certs

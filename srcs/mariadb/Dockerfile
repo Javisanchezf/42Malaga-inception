@@ -6,27 +6,15 @@ FROM alpine:3.19
 ENV TERM xterm
 
 # Update the package repository and install MariaDB and its client
-RUN apk update && apk add mariadb mariadb-client
+RUN apk update && \
+	apk upgrade && \
+	apk add --no-cache mariadb mariadb-common mariadb-client openrc
 
-# Run the MySQL installation script with the specified user
-RUN mysql_install_db --user=mysql
+RUN openrc && touch /run/openrc/softlevel
 
-# Copy MariaDB configuration files to the appropriate directory
 COPY my.cnf /etc/mysql/my.cnf
-
-# Define volumes for MariaDB data directory and log directory
-VOLUME /var/lib/mysql
-# VOLUME /var/log/mysql
-
-# Create a directory for MariaDB backups and set permissions
-RUN mkdir -p /var/backups/mysql
-RUN chmod a+r /var/backups/mysql/
-
-# Specify a volume for MariaDB backup directory
-VOLUME /var/backups/mysql
-
-# Expose the default MariaDB port
-EXPOSE 3306
+COPY run.sh /run.sh
+RUN chmod +x /run.sh
 
 # Set the entry point to start MariaDB using 'mysqld_safe'
-CMD ["mysqld_safe"]
+CMD ["/run.sh" ]

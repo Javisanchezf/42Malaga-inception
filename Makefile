@@ -21,6 +21,13 @@ all: up
 
 up: $(CERTIFICATE)
 	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml up -d
+	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║════════════════════════════════╗$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) You can see the containers logs                         $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   You can see the containers, images and networks         $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make down $(BLUE) You can to stop services in Docker Compose              $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make re $(BLUE)   You can restart all de containers                       $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)╚══════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
+
 
 down:
 	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml down
