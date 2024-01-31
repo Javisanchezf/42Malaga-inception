@@ -26,4 +26,6 @@ services:
     image: mariadb-alpine
     networks:
       - inception
+    env_file:
+      - ../.mariadb_env
     restart: always

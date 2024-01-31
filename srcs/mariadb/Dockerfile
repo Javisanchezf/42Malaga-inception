@@ -12,9 +12,9 @@ RUN apk update && \
 
 RUN openrc && touch /run/openrc/softlevel
 
-COPY my.cnf /etc/mysql/my.cnf
-COPY run.sh /run.sh
-RUN chmod +x /run.sh
+COPY run.sh .
+COPY wordpress.sql .
+RUN chmod +x run.sh
 
 # Set the entry point to start MariaDB using 'mysqld_safe'
-CMD ["/run.sh" ]
+CMD ["./run.sh" ]

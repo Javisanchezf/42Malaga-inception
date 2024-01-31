@@ -1,35 +1,49 @@
 #VARIABLES
 #You can change any of the following parameters with your data and it will continue to work
-#If you change the domain name you must execute "make change_domain" after the change. Be careful, this will change the hosts file.
+#If you change the domain name you must execute "make host" after the change. Be careful, this will change the hosts file.
+
+#DOMAIN
 DOMAIN_NAME=javiersa.42.fr
+
+#CERTIFICATE
 CRT_COUNTRY=ES
 CRT_LOCATION=Malaga
 CRT_ORG=42
 CRT_ORG_UNITY=student
 
-#ROUTES
-NGINX_ROUTE=srcs/nginx
+#MARIADB
+MYSQL_USER=javiersa
+MYSQL_PASS=7cjU2vaU6DQo%3
+MYSQL_ROOT_USER=root
+MYSQL_ROOT_PASS=fg889E%&NsY7Wf
+
+#OTHER
 MSSG_DIR=/dev/null
 
+###################################################################################################################################
+
 #SELF SYSTEM
-CRT=$(NGINX_ROUTE)/$(DOMAIN_NAME).crt
-KEY=$(NGINX_ROUTE)/$(DOMAIN_NAME).key
+CRT=srcs/nginx/$(DOMAIN_NAME).crt
+KEY=srcs/nginx/$(DOMAIN_NAME).key
 CERTIFICATE = $(CRT) $(KEY)
+MARIADB_ENV=.mariadb_env
 
 
 all: up
 
-up: $(CERTIFICATE)
-	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml up -d
-	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║════════════════════════════════╗$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) You can see the containers logs                         $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   You can see the containers, images and networks         $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make down $(BLUE) You can to stop services in Docker Compose              $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make re $(BLUE)   You can restart all de containers                       $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)╚══════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
+up: $(CERTIFICATE) $(MARIADB_ENV)
+	#export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml up -d
+	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║═══════════════════════════════╗$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) To see the containers logs                             $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   To see the containers, images and networks             $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make down $(BLUE) Stop all the services in docker compose                $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make clean $(BLUE)Remove crts, containers, images, volumes and networks  $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make re $(BLUE)   Restart crts, containers, images, volumes and networks $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make host $(BLUE) Rewrite the domain name in the host file               $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)╚═════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
 
 
-down:
+down: $(MARIADB_ENV)
 	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml down
 
 logs:
@@ -44,9 +58,6 @@ ls:
 	@docker network ls
 	@echo -e "\n"
 
-$(CERTIFICATE):
-	@openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $(KEY) -out $(CRT) -subj "/C=$(CRT_COUNTRY)/L=$(CRT_LOCATION)/O=$(CRT_ORG)/OU=$(CRT_ORG_UNITY)/CN=$(DOMAIN_NAME)"
-	@echo -e "$(GREEN)✔$(DEFAULT) Self-signed certificate: $(GREEN)Created$(DEFAULT)"
 
 clean: down
 	@rm -rf $(CERTIFICATE); echo -e "$(GREEN)✔$(DEFAULT) Certificates : $(GREEN)Deleted$(DEFAULT)"
@@ -59,10 +70,23 @@ clean: down
 
 re: clean all
 
-change_domain:
+host:
 	@echo "127.0.0.1       localhost.my.domain localhost localhost.localdomain localhost $(DOMAIN_NAME) www.$(DOMAIN_NAME)">/etc/hosts
 	@echo "::1             localhost localhost.localdomain" >> /etc/hosts
 	@echo -e "Domain name changed to: $(GREEN) $(DOMAIN_NAME) $(DEFAULT)"
+
+$(CERTIFICATE):
+	@openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $(KEY) -out $(CRT) -subj "/C=$(CRT_COUNTRY)/L=$(CRT_LOCATION)/O=$(CRT_ORG)/OU=$(CRT_ORG_UNITY)/CN=$(DOMAIN_NAME)" > $(MSSG_DIR) 2>$(MSSG_DIR)
+	@echo -e "$(GREEN)✔$(DEFAULT) Self-signed certificate: $(GREEN)Created$(DEFAULT)"
+
+$(MARIADB_ENV):
+	@echo -e "#MARIADB" > $(MARIADB_ENV)
+	@echo -e "MYSQL_USER=$(MYSQL_USER)" >> $(MARIADB_ENV)
+	@echo -e "MYSQL_PASS=$(MYSQL_PASS)" >> $(MARIADB_ENV)
+	@echo -e "MYSQL_ROOT_USER=$(MYSQL_ROOT_USER)" >> $(MARIADB_ENV)
+	@echo -e "MYSQL_ROOT_PASS=$(MYSQL_ROOT_PASS)" >> $(MARIADB_ENV)
+
+###################################################################################################################################
 
 # Personal use variables
 DATETIME := $(shell date +%Y-%m-%d' '%H:%M:%S)
@@ -94,4 +118,4 @@ CYAN	:= \033[36;1m
 WHITE	:= \033[37;1m
 DEFAULT	:= \033[0m
 
-.PHONY : all clean re up down git CRT_DIR
+.PHONY : all clean re up down ls logs host git
