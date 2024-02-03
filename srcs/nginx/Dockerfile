@@ -13,7 +13,7 @@ RUN apk update && \
 RUN mkdir -p /etc/nginx/certs
 
 # Copy configuration files
-COPY script.sh /script.sh
+COPY run.sh /run.sh
 COPY $DOMAIN_NAME.crt /etc/nginx/certs/$DOMAIN_NAME.crt
 COPY $DOMAIN_NAME.key /etc/nginx/certs/$DOMAIN_NAME.key
 
@@ -23,4 +23,4 @@ RUN chmod +x /run.sh
 EXPOSE 443
 
 # Start NGINX
-CMD ["/script.sh"]
+CMD ["/run.sh"]
