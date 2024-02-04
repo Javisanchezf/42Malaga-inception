@@ -56,6 +56,13 @@ down: $(ENVS)
 logs:
 	@docker-compose -f ./srcs/docker-compose.yml logs
 
+logs-wp:
+	@docker-compose -f ./srcs/docker-compose.yml logs wordpress
+logs-nginx:
+	@docker-compose -f ./srcs/docker-compose.yml logs nginx
+logs-mariadb:
+	@docker-compose -f ./srcs/docker-compose.yml logs mariadb
+
 ls:
 	@echo -e "\n$(BLUE)CONTAINERS:$(DEFAULT)"
 	@docker ps -a

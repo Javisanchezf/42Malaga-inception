@@ -30,5 +30,8 @@ if [ ! -d "/domains/$DOMAIN_NAME" ]; then
     wp theme install astra --activate --allow-root
     wp plugin install wp-fastest-cache --activate --allow-root
     wp plugin update --all --allow-root
+    sed -i 's/^listen = .*/listen = 0.0.0.0:9000/' /etc/php*/php-fpm*.d/www.conf
     php
 fi
+
+while true; do sleep 1000; done
