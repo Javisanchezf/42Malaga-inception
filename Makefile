@@ -17,6 +17,7 @@ DB_USER=javiersa
 DB_PASS:=$(shell openssl rand -base64 12)
 DB_ROOT_USER=root
 DB_ROOT_PASS:=$(shell openssl rand -base64 12)
+DB_HOST=mariadb
 
 #WORDPRESS
 ADMIN_USER=javiersa
@@ -106,6 +107,7 @@ $(ENV_WORDPRESS):
 	@echo -e "ADMIN_USER=$(ADMIN_USER)" >> $(ENV_WORDPRESS)
 	@echo -e "ADMIN_PASS=$(ADMIN_PASS)" >> $(ENV_WORDPRESS)
 	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS)
+	@echo -e "DB_HOST=$(DB_HOST)" >> $(ENV_WORDPRESS)
 
 ###################################################################################################################################
 
