@@ -5,27 +5,37 @@ networks:
     name: inception
 
 services:
-  nginx:
-    container_name: nginx
+  # nginx:
+  #   container_name: nginx
+  #   build:
+  #     context: ./nginx/.
+  #   image: nginx-tls-alpine
+  #   ports:
+  #     - "443:443"
+  #   networks:
+  #     - inception
+  #   env_file:
+  #     - .env_nginx
+  #   restart: always
+  # mariadb:
+  #   container_name: mariadb
+  #   build:
+  #     context: ./mariadb/.
+  #     # args:
+  #     #   - DOMAIN_NAME=${DOMAIN_NAME}
+  #   image: mariadb-alpine
+  #   networks:
+  #     - inception
+  #   env_file:
+  #     - .mariadb_env
+  #   restart: always
+  wordpress:
+    container_name: wordpress
     build:
-      context: ./nginx/.
-      args:
-        - DOMAIN_NAME=${DOMAIN_NAME}
-    image: nginx-tls-alpine
-    ports:
-      - "443:443"
-    networks:
-      - inception
-    restart: always
-  mariadb:
-    container_name: mariadb
-    build:
-      context: ./mariadb/.
-      # args:
-      #   - DOMAIN_NAME=${DOMAIN_NAME}
-    image: mariadb-alpine
+      context: ./wordpress/.
+    image: wordpress-alpine
     networks:
       - inception
     env_file:
-      - ../.mariadb_env
-    restart: always
+      - .env_wordpress
+    # restart: always

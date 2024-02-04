@@ -4,17 +4,11 @@ FROM alpine:3.19
 # Install NGINX and OpenSSL
 RUN apk update && \
 	apk upgrade && \
-    apk add --no-cache php
+    apk add --no-cache php php-phar php-curl php-mysqli php-tokenizer curl
 
-# Download WordPress and untar it
-RUN wget https://wordpress.org/latest.tar.gz
-RUN tar xvf latest.tar.gz
-RUN rm latest.tar.gz
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/bin/wp
 
 COPY run.sh .
 RUN chmod +x run.sh
 
-# Start NGINX
 CMD ["/run.sh"]
-
-#define('WP_DEBUG_LOG', true);!!!!!!!!!!!!!!!!!!!!!!!!!!!!
