@@ -11,11 +11,18 @@ CRT_LOCATION=Malaga
 CRT_ORG=42
 CRT_ORG_UNITY=student
 
-#MARIADB
-MYSQL_USER=javiersa
-MYSQL_PASS=7cjU2vaU6DQo%3
-MYSQL_ROOT_USER=root
-MYSQL_ROOT_PASS=fg889E%&NsY7Wf
+#DATABASE
+DB_NAME = db_$(subst .,_,$(DOMAIN_NAME))
+DB_USER=javiersa
+DB_PASS:=$(shell openssl rand -base64 12)
+DB_ROOT_USER=root
+DB_ROOT_PASS:=$(shell openssl rand -base64 12)
+
+#WORDPRESS
+ADMIN_USER=javiersa
+ADMIN_PASS:=$(shell openssl rand -base64 12)
+ADMIN_EMAIL=javiersa@student.42malaga.com
+
 
 #OTHER
 MSSG_DIR=/dev/null
@@ -44,7 +51,7 @@ up: $(ENVS)
 
 down: $(ENVS)
 	@docker-compose -f ./srcs/docker-compose.yml down
-	
+
 logs:
 	@docker-compose -f ./srcs/docker-compose.yml logs
 
@@ -76,10 +83,11 @@ re: down up
 
 $(ENV_MARIADB):
 	@echo -e "#MARIADB" > $(ENV_MARIADB)
-	@echo -e "MYSQL_USER=$(MYSQL_USER)" >> $(ENV_MARIADB)
-	@echo -e "MYSQL_PASS=$(MYSQL_PASS)" >> $(ENV_MARIADB)
-	@echo -e "MYSQL_ROOT_USER=$(MYSQL_ROOT_USER)" >> $(ENV_MARIADB)
-	@echo -e "MYSQL_ROOT_PASS=$(MYSQL_ROOT_PASS)" >> $(ENV_MARIADB)
+	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_MARIADB)
+	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_MARIADB)
+	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_MARIADB)
+	@echo -e "DB_ROOT_USER=$(DB_ROOT_USER)" >> $(ENV_MARIADB)
+	@echo -e "DB_ROOT_PASS=$(DB_ROOT_PASS)" >> $(ENV_MARIADB)
 
 $(ENV_NGINX):
 	@echo -e "#NGINX" > $(ENV_NGINX)
@@ -92,8 +100,12 @@ $(ENV_NGINX):
 $(ENV_WORDPRESS):
 	@echo -e "#WORDPRESS" > $(ENV_WORDPRESS)
 	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_WORDPRESS)
-	@echo -e "MYSQL_USER=$(MYSQL_USER)" >> $(ENV_WORDPRESS)
-	@echo -e "MYSQL_PASS=$(MYSQL_PASS)" >> $(ENV_WORDPRESS)
+	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_WORDPRESS)
+	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_WORDPRESS)
+	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_WORDPRESS)
+	@echo -e "ADMIN_USER=$(ADMIN_USER)" >> $(ENV_WORDPRESS)
+	@echo -e "ADMIN_PASS=$(ADMIN_PASS)" >> $(ENV_WORDPRESS)
+	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS)
 
 ###################################################################################################################################
 
