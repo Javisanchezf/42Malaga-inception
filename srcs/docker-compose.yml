@@ -42,4 +42,4 @@ services:
       - inception
     env_file:
       - .env_wordpress
-    # restart: always
+    restart: always
