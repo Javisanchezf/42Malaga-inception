@@ -30,8 +30,11 @@ if [ ! -d "/domains/$DOMAIN_NAME" ]; then
     wp theme install astra --activate --allow-root
     wp plugin install wp-fastest-cache --activate --allow-root
     wp plugin update --all --allow-root
+    #Execute the commands regardless of the installed version of php-fpm, this being the latest available
     sed -i 's/^listen = .*/listen = 0.0.0.0:9000/' /etc/php*/php-fpm*.d/www.conf
-    php
+    mv /usr/sbin/php-fpm* /usr/sbin/php-fpm
+    mv /usr/bin/php-fpm* /usr/bin/php-fpm
+    php-fpm -R
 fi
 
 while true; do sleep 1000; done
