@@ -10,8 +10,8 @@ if [ ! -d "/domains/$DOMAIN_NAME" ]; then
     wp config set DB_USER $DB_USER
     wp config set DB_PASSWORD $DB_PASS
     wp config set DB_HOST $DB_HOST
-    wp config set DB_CHARSET utf8
-    wp config set DB_COLLATE ''
+    wp config set DB_CHARSET utf8mb4
+    wp config set DB_COLLATE 'utf8mb4_unicode_ci'
 
     ##############################################
     # wp config set WP_ALLOW_REPAIR true
@@ -30,7 +30,7 @@ if [ ! -d "/domains/$DOMAIN_NAME" ]; then
     wp core install --url=$DOMAIN_NAME --title=$DOMAIN_NAME --admin_user=$ADMIN_USER --admin_password=$ADMIN_PASS --admin_email=$ADMIN_EMAIL
     # wp config set FORCE_SSL_ADMIN true
     # wp config set WP_REDIS_HOST redis
-    # wp define WP_REDIS_PORT 6379
+    # wp config set WP_REDIS_PORT 6379
     wp user create example example@example.com --role=author --user_pass=forty-two --allow-root
     # wp theme install astra --activate --allow-root
     # wp plugin install wp-fastest-cache --activate --allow-root
@@ -41,6 +41,7 @@ if [ ! -d "/domains/$DOMAIN_NAME" ]; then
     sed -i 's/^listen = .*/listen = 0.0.0.0:9000/' /etc/php*/php-fpm*.d/www.conf
     mv /usr/sbin/php-fpm* /usr/sbin/php-fpm
     mv /usr/bin/php-fpm* /usr/bin/php-fpm
+    # wp redis enable --allow-root
 fi
 
 php-fpm -FR

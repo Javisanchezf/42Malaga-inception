@@ -4,7 +4,7 @@ if [ ! -f "/var/lib/mysql/ib_buffer_pool" ]; then
 	/etc/init.d/mariadb setup
 	rc-service mariadb start
 
-	echo "CREATE DATABASE IF NOT EXISTS ${DB_NAME}" | mysql -u ${DB_ROOT_USER}
+	echo "CREATE DATABASE IF NOT EXISTS ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" | mysql -u ${DB_ROOT_USER}
 	# Create new user and Make The user GRANT ALL PRIVILEGES to all databases in loaclhosts
 	echo "CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';" | mysql -u ${DB_ROOT_USER}
 	echo "GRANT ALL PRIVILEGES ON *.* TO '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';" | mysql -u ${DB_ROOT_USER}
