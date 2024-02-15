@@ -39,8 +39,7 @@ ENVS = $(ENV_MARIADB) $(ENV_NGINX) $(ENV_WORDPRESS)
 all: up
 
 up: $(ENVS)
-	@service docker start >$(MSSG_DIR) 2>$(MSSG_DIR) || true
-	@docker-compose -f ./srcs/docker-compose.yml up -d
+	@docker-compose -f ./srcs/docker-compose.yml up -d --build
 	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║═══════════════════════════════╗$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) To see the containers logs                             $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   To see the containers, images and networks             $(GREEN)║$(DEFAULT)"
