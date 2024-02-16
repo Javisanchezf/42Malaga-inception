@@ -1,10 +1,9 @@
 # Use the Alpine Linux 3.19 base image
 FROM alpine:3.19
 
-# Install NGINX and OpenSSL
 RUN apk update && \
 	apk upgrade && \
-    apk add --no-cache php82 php82-phar php82-curl php82-mysqli php82-tokenizer php82-fpm php82-iconv php82-mbstring \
+    apk add --no-cache php82 php82-phar php82-curl php82-mysqli php82-tokenizer php82-fpm php82-iconv php82-mbstring php82-openssl php82-xml php82-opcache php82-json \
     curl
 
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/bin/wp
