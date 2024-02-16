@@ -13,4 +13,6 @@ RUN apk update && \
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
 
+EXPOSE 443
+
 CMD ["/run.sh"]
