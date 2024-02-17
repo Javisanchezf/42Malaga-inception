@@ -3,7 +3,7 @@
 # Start the services
 rc-service mariadb restart
 
-# Initial setup of the database
+# Initial setup and cleaning of the database
 mariadb -e "DROP DATABASE test;"
 mariadb -e "DELETE FROM mysql.user WHERE User='';"
 mariadb -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
@@ -20,4 +20,4 @@ mariadb -p$DB_ROOT_PASS -e "FLUSH PRIVILEGES;"
 rc-service mariadb stop
 
 # Start the services in daemon mode
-mariadbd --basedir=/usr --datadir=/var/lib/mysql --user=root
+mariadbd --basedir=/usr --datadir=/var/lib/mysql --user=mysql
