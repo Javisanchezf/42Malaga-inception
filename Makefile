@@ -15,7 +15,6 @@ CRT_ORG_UNITY=student
 DB_NAME = db_$(subst .,_,$(DOMAIN_NAME))
 DB_USER=javiersa
 DB_PASS:=$(shell openssl rand -base64 12)
-DB_ROOT_USER=root
 DB_ROOT_PASS:=$(shell openssl rand -base64 12)
 DB_HOST=mariadb
 
@@ -36,7 +35,7 @@ ENV_NGINX=srcs/.env_nginx
 ENV_WORDPRESS=srcs/.env_wordpress
 ENVS = $(ENV_MARIADB) $(ENV_NGINX) $(ENV_WORDPRESS)
 
-all: up
+all: host up
 
 up: $(ENVS)
 	@docker-compose -f ./srcs/docker-compose.yml up -d --build
@@ -46,7 +45,11 @@ up: $(ENVS)
 	@echo -e "$(GREEN)║   $(MAGENTA)make down $(BLUE) Stop all the services in docker compose                $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make clean $(BLUE)Remove crts, containers, images, volumes and networks  $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make re $(BLUE)   Restart the docker compose                             $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make host $(BLUE) Rewrite the domain name in the host file               $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make host $(BLUE) Put the domain name in the host file                   $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make prune $(BLUE) Remove all unused data in docker                      $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs-wp $(BLUE)To see the wordpress container logs                  $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs-nginx $(BLUE)To see the nginx container logs                   $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs-mariadb $(BLUE)To see the mariadb container logs               $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)╚═════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
 
 down: $(ENVS)
@@ -82,18 +85,25 @@ clean: down
 	@echo -e "$(GREEN)✔$(DEFAULT) Envs: $(GREEN)Deleted$(DEFAULT)"
 
 host:
-	@echo "127.0.0.1       localhost.my.domain localhost localhost.localdomain localhost $(DOMAIN_NAME) www.$(DOMAIN_NAME)">/etc/hosts
-	@echo "::1             localhost localhost.localdomain" >> /etc/hosts
-	@echo -e "Domain name changed to: $(GREEN) $(DOMAIN_NAME) $(DEFAULT)"
+	@if ! grep -q "$(DOMAIN_NAME)" /etc/hosts; then \
+		echo -e "$(RED)✘$(DEFAULT) Hosts: $(RED)Not found$(DEFAULT)" && \
+		echo -e "$(GREEN)Adding $(DOMAIN_NAME) to /etc/hosts...$(DEFAULT)" && \
+        echo "127.0.0.1 $(DOMAIN_NAME) www.$(DOMAIN_NAME)" >> /etc/hosts; \
+        echo -e "$(GREEN)✔$(DEFAULT) Hosts: $(GREEN)Updated$(DEFAULT)"; \
+    else \
+        echo -e "$(GREEN)✔$(DEFAULT) Hosts: $(GREEN)Already up-to-date$(DEFAULT)"; \
+    fi
 
 re: down up
+
+prune:
+	@docker system prune -a -f
 
 $(ENV_MARIADB):
 	@echo -e "#MARIADB" > $(ENV_MARIADB)
 	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_MARIADB)
 	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_MARIADB)
 	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_MARIADB)
-	@echo -e "DB_ROOT_USER=$(DB_ROOT_USER)" >> $(ENV_MARIADB)
 	@echo -e "DB_ROOT_PASS=$(DB_ROOT_PASS)" >> $(ENV_MARIADB)
 
 $(ENV_NGINX):
@@ -147,4 +157,4 @@ CYAN	:= \033[36;1m
 WHITE	:= \033[37;1m
 DEFAULT	:= \033[0m
 
-.PHONY : all clean re up down ls logs host git
+.PHONY : all clean re up down ls logs host git logs-wp logs-nginx logs-mariadb prune

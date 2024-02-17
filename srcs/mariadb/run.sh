@@ -1,27 +1,23 @@
 #!/bin/sh
 
-if [ ! -f "/var/lib/mysql/ib_buffer_pool" ]; then
-	/etc/init.d/mariadb setup
-	rc-service mariadb start
-
-	echo "CREATE DATABASE IF NOT EXISTS ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" | mysql -u ${DB_ROOT_USER}
-	# Create new user and Make The user GRANT ALL PRIVILEGES to all databases in loaclhosts
-	echo "CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';" | mysql -u ${DB_ROOT_USER}
-	echo "GRANT ALL PRIVILEGES ON *.* TO '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';" | mysql -u ${DB_ROOT_USER}
-	echo "FLUSH PRIVILEGES;" | mysql -u ${DB_ROOT_USER}
-	
-
-	# Create new user and Make The user GRANT ALL PRIVILEGES on Wordpress database
-	echo "CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';" | mysql -u ${DB_ROOT_USER}
-	echo "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';" | mysql -u ${DB_ROOT_USER}
-	echo "FLUSH PRIVILEGES;" | mysql -u ${DB_ROOT_USER}
-	# Change Password For root user
-    mysql -u ${DB_ROOT_USER} -e "ALTER USER '${DB_ROOT_USER}'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';"
-fi
-# Comment skip-networking
-sed -i 's/skip-networking/# skip-networking/g' /etc/my.cnf.d/mariadb-server.cnf
+# Start the services
 rc-service mariadb restart
+
+# Initial setup of the database
+mariadb -e "DROP DATABASE test;"
+mariadb -e "DELETE FROM mysql.user WHERE User='';"
+mariadb -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+mariadb -e "FLUSH PRIVILEGES;"
+
+# Create the database and the user
+mariadb -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_ROOT_PASS'"
+mariadb -p$DB_ROOT_PASS -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE utf8_general_ci;"
+mariadb -p$DB_ROOT_PASS -e "CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASS';"
+mariadb -p$DB_ROOT_PASS -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%' WITH GRANT OPTION;"
+mariadb -p$DB_ROOT_PASS -e "FLUSH PRIVILEGES;"
+
+# Stop the services
 rc-service mariadb stop
 
-# Running This Command "/usr/bin/mariadbd" to stay running in the foreground
-/usr/bin/mariadbd --basedir=/usr --datadir=/var/lib/mysql --plugin-dir=/usr/lib/mariadb/plugin --user=mysql --pid-file=/run/mysqld/mariadb.pid
+# Start the services in daemon mode
+mariadbd --basedir=/usr --datadir=/var/lib/mysql --user=root
