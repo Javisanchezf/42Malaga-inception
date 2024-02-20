@@ -151,6 +151,86 @@ $(VOLUME_REF): $(VOLUMES)
 
 ###################################################################################################################################
 
+#BONUS
+ENV_MARIADB_BONUS=srcs_bonus/.env_mariadb
+ENV_NGINX_BONUS=srcs_bonus/.env_nginx
+ENV_WORDPRESS_BONUS=srcs_bonus/.env_wordpress
+ENVS_BONUS = $(ENV_MARIADB_BONUS) $(ENV_NGINX_BONUS) $(ENV_WORDPRESS_BONUS)
+
+bonus: host bonus-up
+
+bonus-up: $(ENVS_BONUS) $(VOLUME_REF) $(VOLUMES)
+	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml up --build -d --remove-orphans
+	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║═══════════════════════════════╗$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) To see the containers logs                             $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   To see the containers, images and networks             $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make down $(BLUE) Stop all the services in docker compose                $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make clean $(BLUE)Remove crts, containers, images, volumes and networks  $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make re $(BLUE)   Restart the docker compose                             $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make host $(BLUE) Put the domain name in the host file                   $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make prune $(BLUE) Remove all unused data in docker                      $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs-wp $(BLUE)To see the wordpress container logs                  $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs-nginx $(BLUE)To see the nginx container logs                   $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs-mariadb $(BLUE)To see the mariadb container logs               $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)╚═════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
+
+bonus-down: $(ENVS_BONUS)
+	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml down --volumes --remove-orphans
+
+bonus-logs:
+	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml logs
+
+bonus-logs-wp:
+	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml logs wordpress
+bonus-logs-nginx:
+	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml logs nginx
+bonus-logs-mariadb:
+	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml logs mariadb
+
+bonus-clean: bonus-down
+	@echo -e "$(GREEN)✔$(DEFAULT) Cointainers $$(docker ps -qa | tr '\n' ' '): $(GREEN)Stopped$(DEFAULT)"; docker stop $$(docker ps -qa) >$(MSSG_DIR) 2>$(MSSG_DIR) || true ;\
+	echo -e "$(GREEN)✔$(DEFAULT) Cointainers $$(docker ps -qa | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker rm $$(docker ps -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
+	echo -e "$(GREEN)✔$(DEFAULT) Images $$(docker images -qa | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker rmi -f $$(docker images -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
+	echo -e "$(GREEN)✔$(DEFAULT) Volumes $$(docker volume ls -q | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker volume rm $$(docker volume ls -q) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
+	echo -e "$(GREEN)✔$(DEFAULT) Networks $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)' | tr ':' ','): $(GREEN)Deleted$(DEFAULT)"; docker network rm $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)') >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true
+	@rm -rf $(ENVS_BONUS)
+	@echo -e "$(GREEN)✔$(DEFAULT) Envs: $(GREEN)Deleted$(DEFAULT)"
+	@rm -rf $(VOLUMES_DIR)
+	@echo -e "$(GREEN)✔$(DEFAULT) Volumes: $(GREEN)Deleted$(DEFAULT)"
+	@rm -rf $(VOLUME_REF)
+	@echo -e "$(GREEN)✔$(DEFAULT) Symlink: $(GREEN)Deleted$(DEFAULT)"
+
+bonus-re: bonus-down bonus-up
+
+$(ENV_MARIADB_BONUS):
+	@echo -e "#MARIADB" > $(ENV_MARIADB_BONUS)
+	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_MARIADB_BONUS)
+	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_MARIADB_BONUS)
+	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_MARIADB_BONUS)
+	@echo -e "DB_ROOT_PASS=$(DB_ROOT_PASS)" >> $(ENV_MARIADB_BONUS)
+
+$(ENV_NGINX_BONUS):
+	@echo -e "#NGINX" > $(ENV_NGINX_BONUS)
+	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_NGINX_BONUS)
+	@echo -e "CRT_COUNTRY=$(CRT_COUNTRY)" >> $(ENV_NGINX_BONUS)
+	@echo -e "CRT_LOCATION=$(CRT_LOCATION)" >> $(ENV_NGINX_BONUS)
+	@echo -e "CRT_ORG=$(CRT_ORG)" >> $(ENV_NGINX_BONUS)
+	@echo -e "CRT_ORG_UNITY=$(CRT_ORG_UNITY)" >> $(ENV_NGINX_BONUS)
+
+$(ENV_WORDPRESS_BONUS):
+	@echo -e "#WORDPRESS" > $(ENV_WORDPRESS_BONUS)
+	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_WORDPRESS_BONUS)
+	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_WORDPRESS_BONUS)
+	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_WORDPRESS_BONUS)
+	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_WORDPRESS_BONUS)
+	@echo -e "ADMIN_USER=$(ADMIN_USER)" >> $(ENV_WORDPRESS_BONUS)
+	@echo -e "ADMIN_PASS=$(ADMIN_PASS)" >> $(ENV_WORDPRESS_BONUS)
+	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS_BONUS)
+	@echo -e "DB_HOST=$(DB_HOST)" >> $(ENV_WORDPRESS_BONUS)
+
+
+###################################################################################################################################
+
 # Personal use variables
 DATETIME := $(shell date +%Y-%m-%d' '%H:%M:%S)
 USER := $(shell whoami)

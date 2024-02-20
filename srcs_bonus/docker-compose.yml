@@ -1,0 +1,73 @@
+version: '3.8'
+
+networks:
+  inception:
+    name: inception
+
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx/.
+    image: nginx-tls-alpine
+    ports:
+      - "443:443"
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+    env_file:
+      - .env_nginx
+    volumes:
+      - wp-data:/domains/${DOMAIN_NAME}/public_html
+    restart: always
+
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./mariadb/.
+    image: mariadb-alpine
+    networks:
+      - inception
+    env_file:
+      - .env_mariadb
+    volumes:
+      - db-data:/var/lib/mysql
+    restart: always
+
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./wordpress/.
+    image: wordpress-alpine
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+    env_file:
+      - .env_wordpress
+    volumes:
+      - wp-data:/domains/${DOMAIN_NAME}/public_html
+    restart: always
+
+  redis:
+    container_name: redis
+    build:
+      context: ./redis/.
+    image: redis-alpine
+    networks:
+      - inception
+    restart: always
+
+
+volumes:
+  wp-data:
+    driver_opts:
+      type: none
+      device: /home/${ALUMNI}/data/volumes/wp
+      o: bind
+  db-data:
+    driver_opts:
+      type: none
+      device: /home/${ALUMNI}/data/volumes/db
+      o: bind
