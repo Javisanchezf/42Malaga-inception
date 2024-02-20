@@ -44,10 +44,12 @@ ENV_NGINX=srcs/.env_nginx
 ENV_WORDPRESS=srcs/.env_wordpress
 ENVS = $(ENV_MARIADB) $(ENV_NGINX) $(ENV_WORDPRESS)
 
+IMPORTS = export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI);
+
 all: host up
 
 up: $(ENVS) $(VOLUME_REF) $(VOLUMES)
-	@export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI); docker-compose -f ./srcs/docker-compose.yml up --build -d --remove-orphans
+	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml up --build -d --remove-orphans
 	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║═══════════════════════════════╗$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) To see the containers logs                             $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   To see the containers, images and networks             $(GREEN)║$(DEFAULT)"
@@ -62,17 +64,17 @@ up: $(ENVS) $(VOLUME_REF) $(VOLUMES)
 	@echo -e "$(GREEN)╚═════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
 
 down: $(ENVS)
-	@export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI); docker-compose -f ./srcs/docker-compose.yml down --volumes --remove-orphans
+	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml down --volumes --remove-orphans
 
 logs:
-	@docker-compose -f ./srcs/docker-compose.yml logs
+	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml logs
 
 logs-wp:
-	@docker-compose -f ./srcs/docker-compose.yml logs wordpress
+	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml logs wordpress
 logs-nginx:
-	@docker-compose -f ./srcs/docker-compose.yml logs nginx
+	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml logs nginx
 logs-mariadb:
-	@docker-compose -f ./srcs/docker-compose.yml logs mariadb
+	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml logs mariadb
 
 ls:
 	@echo -e "\n$(BLUE)CONTAINERS:$(DEFAULT)"

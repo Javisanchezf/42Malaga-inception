@@ -20,4 +20,4 @@ mariadb -p$DB_ROOT_PASS -e "FLUSH PRIVILEGES;"
 rc-service mariadb stop
 
 # Start the services in daemon mode
-mariadbd --basedir=/usr --datadir=/var/lib/mysql --user=mysql
+exec mariadbd --basedir=/usr --datadir=/var/lib/mysql --user=mysql
