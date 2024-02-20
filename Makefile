@@ -32,7 +32,8 @@ MSSG_DIR=/dev/null
 #VOLUMES
 VOLUMES_DIR=/home/$(ALUMNI)/data/volumes
 WP_VOLUME=$(VOLUMES_DIR)/wp
-VOLUMES = $(WP_VOLUME)´
+DB_VOLUME=$(VOLUMES_DIR)/db
+VOLUMES = $(WP_VOLUME) $(DB_VOLUME)
 #VOLUME REFERENCES
 CURRENT_DIR := $(shell pwd)
 VOLUME_REF = $(CURRENT_DIR)/volumes
@@ -140,13 +141,11 @@ $(ENV_WORDPRESS):
 $(VOLUMES_DIR):
 	@mkdir -p $(VOLUMES_DIR)
 
-$(WP_VOLUME): $(VOLUMES_DIR)
-	@mkdir -p $(WP_VOLUME)
-
-$(VOLUMES): $(WP_VOLUME)
+$(VOLUMES):
+	@mkdir -p $(VOLUMES)
 
 $(VOLUME_REF): $(VOLUMES)
-	@ln -s $(WP_VOLUME) $(VOLUME_REF)
+	@ln -s $(VOLUMES_DIR) $(VOLUME_REF)
 
 ###################################################################################################################################
 

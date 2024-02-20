@@ -31,8 +31,8 @@ if ! [ -f /domains/$DOMAIN_NAME/public_html/wp-config.php ]; then
     --dbuser="$DB_USER" \
     --dbpass="$DB_PASS" \
     --dbhost="$DB_HOST" \
-    --dbcharset=utf8 \
-    --dbcollate='' \
+    --dbcharset=utf8mb4 \
+    --dbcollate=utf8mb4_general_ci \
     --extra-php <<PHP
     define('AUTOMATIC_UPDATER_DISABLED', true);
     define('WP_LIMIT_LOGIN_ATTEMPTS', true);
@@ -42,7 +42,7 @@ if ! [ -f /domains/$DOMAIN_NAME/public_html/wp-config.php ]; then
     define('WP_AUTO_UPDATE_CORE', 'minor');
     define('WP_POST_REVISIONS', false);
     define('EMPTY_TRASH_DAYS', 7);
-    define('FS_METHOD', 'direct');
+    define('WP_MEMORY_LIMIT', '256M');
 PHP
     wp config shuffle-salts --allow-root
     

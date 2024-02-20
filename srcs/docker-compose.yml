@@ -19,7 +19,7 @@ services:
     env_file:
       - .env_nginx
     volumes:
-      - wp:/domains/${DOMAIN_NAME}/public_html
+      - wp-data:/domains/${DOMAIN_NAME}/public_html
     restart: always
 
   mariadb:
@@ -31,6 +31,8 @@ services:
       - inception
     env_file:
       - .env_mariadb
+    volumes:
+      - db-data:/var/lib/mysql
     restart: always
 
   wordpress:
@@ -45,12 +47,17 @@ services:
     env_file:
       - .env_wordpress
     volumes:
-      - wp:/domains/${DOMAIN_NAME}/public_html
+      - wp-data:/domains/${DOMAIN_NAME}/public_html
     restart: always
 
 volumes:
-  wp:
+  wp-data:
     driver_opts:
       type: none
       device: /home/${ALUMNI}/data/volumes/wp
+      o: bind
+  db-data:
+    driver_opts:
+      type: none
+      device: /home/${ALUMNI}/data/volumes/db
       o: bind

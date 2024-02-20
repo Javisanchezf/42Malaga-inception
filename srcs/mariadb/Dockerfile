@@ -35,4 +35,4 @@ RUN rm -f /var/cache/apk/*
 # Expose the port for the database
 EXPOSE 3306
 
-CMD ["./run.sh" ]
+ENTRYPOINT ["./run.sh" ]

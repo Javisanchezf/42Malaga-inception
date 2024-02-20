@@ -31,4 +31,4 @@ RUN rm -f /var/cache/apk/*
 # Expose the ports for NGINX
 EXPOSE 443
 
-CMD ["/run.sh"]
+ENTRYPOINT ["/run.sh"]

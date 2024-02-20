@@ -34,6 +34,7 @@ RUN adduser -D -H -S -G www-data www-data && \
     sed -i 's/^listen = .*/listen = 0.0.0.0:9000/' /etc/php${PHP_VERSION}/php-fpm.d/www.conf && \
     sed -i "s/user = nobody/user = www-data/" /etc/php${PHP_VERSION}/php-fpm.d/www.conf && \
     sed -i "s/group = nobody/group = www-data/" /etc/php${PHP_VERSION}/php-fpm.d/www.conf && \
+    sed -i "s/memory_limit = 128M/memory_limit = 256M/" /etc/php${PHP_VERSION}/php.ini && \
     ln -fs /usr/bin/php${PHP_VERSION} /usr/bin/php && \
     ln -s /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm
 
@@ -48,4 +49,4 @@ RUN rm -f /var/cache/apk/*
 # Expose the port for the PHP-FPM service
 EXPOSE 9000
 
-CMD ["/run.sh"]
+ENTRYPOINT ["/run.sh"]
