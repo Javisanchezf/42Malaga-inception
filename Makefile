@@ -27,6 +27,10 @@ ADMIN_EMAIL=javiersa@student.42malaga.com
 #OTHER
 MSSG_DIR=/dev/null
 
+VOLUMES_DIR=srcs/volumes
+WP_VOLUME=$(VOLUMES_DIR)/wp
+VOLUMES = $(WP_VOLUME)
+
 ###################################################################################################################################
 
 #ENVS
@@ -37,8 +41,8 @@ ENVS = $(ENV_MARIADB) $(ENV_NGINX) $(ENV_WORDPRESS)
 
 all: host up
 
-up: $(ENVS)
-	@docker-compose -f ./srcs/docker-compose.yml up -d --build
+up: $(VOLUMES) $(ENVS)
+	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml up --build -d
 	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║═══════════════════════════════╗$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) To see the containers logs                             $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   To see the containers, images and networks             $(GREEN)║$(DEFAULT)"
@@ -53,7 +57,7 @@ up: $(ENVS)
 	@echo -e "$(GREEN)╚═════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
 
 down: $(ENVS)
-	@docker-compose -f ./srcs/docker-compose.yml down
+	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml down --volumes --remove-orphans
 
 logs:
 	@docker-compose -f ./srcs/docker-compose.yml logs
@@ -83,6 +87,8 @@ clean: down
 	echo -e "$(GREEN)✔$(DEFAULT) Networks $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)' | tr ':' ','): $(GREEN)Deleted$(DEFAULT)"; docker network rm $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)') >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true
 	@rm -rf $(ENVS)
 	@echo -e "$(GREEN)✔$(DEFAULT) Envs: $(GREEN)Deleted$(DEFAULT)"
+	@rm -rf $(VOLUMES_DIR)
+	@echo -e "$(GREEN)✔$(DEFAULT) Volumes: $(GREEN)Deleted$(DEFAULT)"
 
 host:
 	@if ! grep -q "$(DOMAIN_NAME)" /etc/hosts; then \
@@ -125,6 +131,11 @@ $(ENV_WORDPRESS):
 	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS)
 	@echo -e "DB_HOST=$(DB_HOST)" >> $(ENV_WORDPRESS)
 
+$(VOLUMES_DIR):
+	@mkdir -p $(VOLUMES_DIR)
+
+$(WP_VOLUME): $(VOLUMES_DIR)
+	@mkdir -p $(WP_VOLUME)
 ###################################################################################################################################
 
 # Personal use variables

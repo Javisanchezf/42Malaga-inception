@@ -5,6 +5,13 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
+if [ ! -d /domains/$DOMAIN_NAME/public_html ]; then
+    echo -e "${GREEN}Creating public_html directory for $DOMAIN_NAME...${NC}"
+    mkdir -p /domains/$DOMAIN_NAME/public_html
+else
+    echo -e "${YELLOW}Public_html directory for $DOMAIN_NAME already exists${NC}"
+fi
+
 # Create SSL certificate
 if [ ! -f /etc/nginx/ssl/$DOMAIN_NAME.key ] || [ ! -f /etc/nginx/ssl/$DOMAIN_NAME.crt ]; then
     echo -e "${GREEN}Creating SSL certificate for $DOMAIN_NAME...${NC}"
