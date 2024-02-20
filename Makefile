@@ -2,7 +2,6 @@
 #You can change any of the following parameters with other data and it will continue to work
 
 #DOMAIN
-#If you change the domain name you must execute "make host" after the change. Be careful, this will change the hosts file.
 DOMAIN_NAME=javiersa.42.fr
 
 #CERTIFICATE
@@ -27,11 +26,13 @@ ADMIN_EMAIL=javiersa@student.42malaga.com
 #OTHER
 MSSG_DIR=/dev/null
 
-VOLUMES_DIR=srcs/volumes
+###################################################################################################################################
+
+#VOLUMES
+CURRENT_DIR := $(shell pwd)
+VOLUMES_DIR=$(CURRENT_DIR)/volumes
 WP_VOLUME=$(VOLUMES_DIR)/wp
 VOLUMES = $(WP_VOLUME)
-
-###################################################################################################################################
 
 #ENVS
 ENV_MARIADB=srcs/.env_mariadb

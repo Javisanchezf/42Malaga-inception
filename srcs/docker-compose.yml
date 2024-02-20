@@ -52,5 +52,5 @@ volumes:
   www-data:
     driver_opts:
       type: none
-      device: ${PWD}/srcs/volumes/wp
+      device: ${PWD}/volumes/wp
       o: bind

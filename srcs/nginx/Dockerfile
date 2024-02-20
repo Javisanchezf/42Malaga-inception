@@ -25,6 +25,8 @@ RUN chmod +x /run.sh
 # Copy the NGINX template configuration file
 COPY nginx_template.conf .
 
+# Clean up the package repository
+RUN rm -f /var/cache/apk/*
 
 # Expose the ports for NGINX
 EXPOSE 443

@@ -29,6 +29,9 @@ RUN mkdir -p /run/mysqld && \
 COPY run.sh .
 RUN chmod +x run.sh
 
+# Clean up the package repository
+RUN rm -f /var/cache/apk/*
+
 # Expose the port for the database
 EXPOSE 3306
 

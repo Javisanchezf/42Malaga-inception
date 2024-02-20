@@ -34,16 +34,16 @@ RUN adduser -D -H -S -G www-data www-data && \
     sed -i 's/^listen = .*/listen = 0.0.0.0:9000/' /etc/php${PHP_VERSION}/php-fpm.d/www.conf && \
     sed -i "s/user = nobody/user = www-data/" /etc/php${PHP_VERSION}/php-fpm.d/www.conf && \
     sed -i "s/group = nobody/group = www-data/" /etc/php${PHP_VERSION}/php-fpm.d/www.conf && \
-    sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php${PHP_VERSION}/php.ini && \
     ln -fs /usr/bin/php${PHP_VERSION} /usr/bin/php && \
     ln -s /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm
 
-# Clean up the package repository
-RUN rm -f /var/cache/apk/*
 
 # Copy the run.sh script to the container
 COPY run.sh .
 RUN chmod +x run.sh
+
+# Clean up the package repository
+RUN rm -f /var/cache/apk/*
 
 # Expose the port for the PHP-FPM service
 EXPOSE 9000
