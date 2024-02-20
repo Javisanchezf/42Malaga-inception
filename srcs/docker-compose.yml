@@ -19,7 +19,7 @@ services:
     env_file:
       - .env_nginx
     volumes:
-      - www-data:/domains/${DOMAIN_NAME}/public_html
+      - wp:/domains/${DOMAIN_NAME}/public_html
     restart: always
 
   mariadb:
@@ -45,12 +45,12 @@ services:
     env_file:
       - .env_wordpress
     volumes:
-      - www-data:/domains/${DOMAIN_NAME}/public_html
+      - wp:/domains/${DOMAIN_NAME}/public_html
     restart: always
 
 volumes:
-  www-data:
+  wp:
     driver_opts:
       type: none
-      device: ${PWD}/volumes/wp
+      device: /home/${ALUMNI}/data/volumes/wp
       o: bind

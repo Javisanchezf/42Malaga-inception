@@ -2,7 +2,8 @@
 #You can change any of the following parameters with other data and it will continue to work
 
 #DOMAIN
-DOMAIN_NAME=javiersa.42.fr
+ALUMNI=javiersa
+DOMAIN_NAME=$(ALUMNI).42.fr
 
 #CERTIFICATE
 CRT_COUNTRY=ES
@@ -12,15 +13,15 @@ CRT_ORG_UNITY=student
 
 #DATABASE
 DB_NAME = db_$(subst .,_,$(DOMAIN_NAME))
-DB_USER=javiersa
+DB_USER=$(ALUMNI)
 DB_PASS:=$(shell openssl rand -base64 12)
 DB_ROOT_PASS:=$(shell openssl rand -base64 12)
 DB_HOST=mariadb
 
 #WORDPRESS
-ADMIN_USER=javiersa
+ADMIN_USER=$(ALUMNI)
 ADMIN_PASS:=$(shell openssl rand -base64 12)
-ADMIN_EMAIL=javiersa@student.42malaga.com
+ADMIN_EMAIL=$(ALUMNI)@student.42malaga.com
 
 
 #OTHER
@@ -29,10 +30,12 @@ MSSG_DIR=/dev/null
 ###################################################################################################################################
 
 #VOLUMES
-CURRENT_DIR := $(shell pwd)
-VOLUMES_DIR=$(CURRENT_DIR)/volumes
+VOLUMES_DIR=/home/$(ALUMNI)/data/volumes
 WP_VOLUME=$(VOLUMES_DIR)/wp
-VOLUMES = $(WP_VOLUME)
+VOLUMES = $(WP_VOLUME)´
+#VOLUME REFERENCES
+CURRENT_DIR := $(shell pwd)
+VOLUME_REF = $(CURRENT_DIR)/volumes
 
 #ENVS
 ENV_MARIADB=srcs/.env_mariadb
@@ -42,8 +45,8 @@ ENVS = $(ENV_MARIADB) $(ENV_NGINX) $(ENV_WORDPRESS)
 
 all: host up
 
-up: $(VOLUMES) $(ENVS)
-	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml up --build -d
+up: $(ENVS) $(VOLUME_REF) $(VOLUMES)
+	@export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI); docker-compose -f ./srcs/docker-compose.yml up --build -d --remove-orphans
 	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║═══════════════════════════════╗$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) To see the containers logs                             $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   To see the containers, images and networks             $(GREEN)║$(DEFAULT)"
@@ -58,7 +61,7 @@ up: $(VOLUMES) $(ENVS)
 	@echo -e "$(GREEN)╚═════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
 
 down: $(ENVS)
-	@export DOMAIN_NAME=$(DOMAIN_NAME); docker-compose -f ./srcs/docker-compose.yml down --volumes --remove-orphans
+	@export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI); docker-compose -f ./srcs/docker-compose.yml down --volumes --remove-orphans
 
 logs:
 	@docker-compose -f ./srcs/docker-compose.yml logs
@@ -90,6 +93,8 @@ clean: down
 	@echo -e "$(GREEN)✔$(DEFAULT) Envs: $(GREEN)Deleted$(DEFAULT)"
 	@rm -rf $(VOLUMES_DIR)
 	@echo -e "$(GREEN)✔$(DEFAULT) Volumes: $(GREEN)Deleted$(DEFAULT)"
+	@rm -rf $(VOLUME_REF)
+	@echo -e "$(GREEN)✔$(DEFAULT) Symlink: $(GREEN)Deleted$(DEFAULT)"
 
 host:
 	@if ! grep -q "$(DOMAIN_NAME)" /etc/hosts; then \
@@ -137,6 +142,12 @@ $(VOLUMES_DIR):
 
 $(WP_VOLUME): $(VOLUMES_DIR)
 	@mkdir -p $(WP_VOLUME)
+
+$(VOLUMES): $(WP_VOLUME)
+
+$(VOLUME_REF): $(VOLUMES)
+	@ln -s $(WP_VOLUME) $(VOLUME_REF)
+
 ###################################################################################################################################
 
 # Personal use variables
