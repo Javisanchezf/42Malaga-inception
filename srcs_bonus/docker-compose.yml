@@ -57,8 +57,6 @@ services:
     image: redis-alpine
     networks:
       - inception
-    depends_on:
-      - wordpress
     volumes:
       - wp-data:/domains/${DOMAIN_NAME}/public_html
     restart: always

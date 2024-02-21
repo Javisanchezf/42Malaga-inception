@@ -16,7 +16,6 @@ DB_NAME = db_$(subst .,_,$(DOMAIN_NAME))
 DB_USER=$(ALUMNI)
 DB_PASS:=$(shell openssl rand -base64 12)
 DB_ROOT_PASS:=$(shell openssl rand -base64 12)
-DB_HOST=mariadb
 
 #WORDPRESS
 ADMIN_USER=$(ALUMNI)
@@ -35,8 +34,7 @@ WP_VOLUME=$(VOLUMES_DIR)/wp
 DB_VOLUME=$(VOLUMES_DIR)/db
 VOLUMES = $(WP_VOLUME) $(DB_VOLUME)
 #VOLUME REFERENCES
-CURRENT_DIR := $(shell pwd)
-VOLUME_REF = $(CURRENT_DIR)/volumes
+VOLUME_REF = ./volumes
 
 #ENVS
 ENV_MARIADB=srcs/.env_mariadb
@@ -44,12 +42,10 @@ ENV_NGINX=srcs/.env_nginx
 ENV_WORDPRESS=srcs/.env_wordpress
 ENVS = $(ENV_MARIADB) $(ENV_NGINX) $(ENV_WORDPRESS)
 
-IMPORTS = export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI);
+DOCKER_COMPOSE = export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI); docker-compose -f ./srcs/docker-compose.yml
+BONUS_DOCKER_COMPOSE = export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI); docker-compose -f ./srcs_bonus/docker-compose.yml
 
-all: host up
-
-up: $(ENVS) $(VOLUME_REF) $(VOLUMES)
-	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml up --build -d --remove-orphans
+define print_commands
 	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║═══════════════════════════════╗$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) To see the containers logs                             $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   To see the containers, images and networks             $(GREEN)║$(DEFAULT)"
@@ -62,43 +58,47 @@ up: $(ENVS) $(VOLUME_REF) $(VOLUMES)
 	@echo -e "$(GREEN)║   $(MAGENTA)make logs-nginx $(BLUE)To see the nginx container logs                   $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make logs-mariadb $(BLUE)To see the mariadb container logs               $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)╚═════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
+endef
 
-down: $(ENVS)
-	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml down --volumes --remove-orphans
-	@rm -rf $(VOLUMES_DIR)
-
-logs:
-	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml logs
-
-logs-wp:
-	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml logs wordpress
-logs-nginx:
-	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml logs nginx
-logs-mariadb:
-	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml logs mariadb
-
-ls:
-	@echo -e "\n$(BLUE)CONTAINERS:$(DEFAULT)"
-	@docker ps -a
-	@echo -e "\n$(YELLOW)IMAGES:$(DEFAULT)"
-	@docker images
-	@echo -e "\n$(GREEN)NETWORKS:$(DEFAULT)"
-	@docker network ls
-	@echo -e "\n"
-
-
-clean: down
+define clean_docker
 	@echo -e "$(GREEN)✔$(DEFAULT) Cointainers $$(docker ps -qa | tr '\n' ' '): $(GREEN)Stopped$(DEFAULT)"; docker stop $$(docker ps -qa) >$(MSSG_DIR) 2>$(MSSG_DIR) || true ;\
 	echo -e "$(GREEN)✔$(DEFAULT) Cointainers $$(docker ps -qa | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker rm $$(docker ps -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
 	echo -e "$(GREEN)✔$(DEFAULT) Images $$(docker images -qa | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker rmi -f $$(docker images -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
 	echo -e "$(GREEN)✔$(DEFAULT) Volumes $$(docker volume ls -q | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker volume rm $$(docker volume ls -q) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
 	echo -e "$(GREEN)✔$(DEFAULT) Networks $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)' | tr ':' ','): $(GREEN)Deleted$(DEFAULT)"; docker network rm $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)') >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true
-	@rm -rf $(ENVS)
-	@echo -e "$(GREEN)✔$(DEFAULT) Envs: $(GREEN)Deleted$(DEFAULT)"
+endef
+
+###################################################################################################################################
+
+all: host up
+
+up: $(ENVS) $(VOLUME_REF) $(VOLUMES)
+	# @$(DOCKER_COMPOSE) up --build -d --remove-orphans
+	$(call print_commands)
+
+down: $(ENVS)
+	@$(DOCKER_COMPOSE) down --volumes --remove-orphans
 	@rm -rf $(VOLUMES_DIR)
-	@echo -e "$(GREEN)✔$(DEFAULT) Volumes: $(GREEN)Deleted$(DEFAULT)"
-	@rm -rf $(VOLUME_REF)
-	@echo -e "$(GREEN)✔$(DEFAULT) Symlink: $(GREEN)Deleted$(DEFAULT)"
+
+logs:
+	@$(DOCKER_COMPOSE) logs
+logs-wp:
+	@$(DOCKER_COMPOSE) logs wordpress
+logs-nginx:
+	@$(DOCKER_COMPOSE) logs nginx
+logs-mariadb:
+	@$(DOCKER_COMPOSE) mariadb
+
+ls:
+	@echo -e "\n$(BLUE)CONTAINERS:$(DEFAULT)" && docker ps -a
+	@echo -e "\n$(YELLOW)IMAGES:$(DEFAULT)" && docker images
+	@echo -e "\n$(GREEN)NETWORKS:$(DEFAULT)" && docker network ls && echo -e "\n"
+
+clean: down
+	$(call clean_docker)
+	@rm -rf $(ENVS) && echo -e "$(GREEN)✔$(DEFAULT) Envs: $(GREEN)Deleted$(DEFAULT)"
+	@rm -rf $(VOLUMES_DIR) && echo -e "$(GREEN)✔$(DEFAULT) Volumes: $(GREEN)Deleted$(DEFAULT)"
+	@rm -rf $(VOLUME_REF) && echo -e "$(GREEN)✔$(DEFAULT) Symlink: $(GREEN)Deleted$(DEFAULT)"
 
 host:
 	@if ! grep -q "$(DOMAIN_NAME)" /etc/hosts; then \
@@ -139,7 +139,6 @@ $(ENV_WORDPRESS):
 	@echo -e "ADMIN_USER=$(ADMIN_USER)" >> $(ENV_WORDPRESS)
 	@echo -e "ADMIN_PASS=$(ADMIN_PASS)" >> $(ENV_WORDPRESS)
 	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS)
-	@echo -e "DB_HOST=$(DB_HOST)" >> $(ENV_WORDPRESS)
 
 $(VOLUMES_DIR):
 	@mkdir -p $(VOLUMES_DIR)
@@ -147,7 +146,7 @@ $(VOLUMES_DIR):
 $(VOLUMES):
 	@mkdir -p $(VOLUMES)
 
-$(VOLUME_REF): $(VOLUMES)
+$(VOLUME_REF):
 	@ln -s $(VOLUMES_DIR) $(VOLUME_REF)
 
 ###################################################################################################################################
@@ -161,46 +160,27 @@ ENVS_BONUS = $(ENV_MARIADB_BONUS) $(ENV_NGINX_BONUS) $(ENV_WORDPRESS_BONUS)
 bonus: host bonus-up
 
 bonus-up: $(ENVS_BONUS) $(VOLUME_REF) $(VOLUMES)
-	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml up --build -d --remove-orphans
-	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║═══════════════════════════════╗$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) To see the containers logs                             $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   To see the containers, images and networks             $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make down $(BLUE) Stop all the services in docker compose                $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make clean $(BLUE)Remove crts, containers, images, volumes and networks  $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make re $(BLUE)   Restart the docker compose                             $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make host $(BLUE) Put the domain name in the host file                   $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make prune $(BLUE) Remove all unused data in docker                      $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make logs-wp $(BLUE)To see the wordpress container logs                  $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make logs-nginx $(BLUE)To see the nginx container logs                   $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make logs-mariadb $(BLUE)To see the mariadb container logs               $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)╚═════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
+	@$(BONUS_DOCKER_COMPOSE) up --build -d --remove-orphans
+	$(call print_commands)
 
 bonus-down: $(ENVS_BONUS)
-	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml down --volumes --remove-orphans
+	@$(BONUS_DOCKER_COMPOSE) down --volumes --remove-orphans
 	@rm -rf $(VOLUMES_DIR)
 
 bonus-logs:
-	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml logs
-
+	@$(BONUS_DOCKER_COMPOSE) logs
 bonus-logs-wp:
-	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml logs wordpress
+	@$(BONUS_DOCKER_COMPOSE) logs wordpress
 bonus-logs-nginx:
-	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml logs nginx
+	@$(BONUS_DOCKER_COMPOSE) logs nginx
 bonus-logs-mariadb:
-	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml logs mariadb
+	@$(BONUS_DOCKER_COMPOSE) logs mariadb
 
 bonus-clean: bonus-down
-	@echo -e "$(GREEN)✔$(DEFAULT) Cointainers $$(docker ps -qa | tr '\n' ' '): $(GREEN)Stopped$(DEFAULT)"; docker stop $$(docker ps -qa) >$(MSSG_DIR) 2>$(MSSG_DIR) || true ;\
-	echo -e "$(GREEN)✔$(DEFAULT) Cointainers $$(docker ps -qa | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker rm $$(docker ps -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
-	echo -e "$(GREEN)✔$(DEFAULT) Images $$(docker images -qa | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker rmi -f $$(docker images -qa) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
-	echo -e "$(GREEN)✔$(DEFAULT) Volumes $$(docker volume ls -q | tr '\n' ' '): $(GREEN)Deleted$(DEFAULT)"; docker volume rm $$(docker volume ls -q) >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true ;\
-	echo -e "$(GREEN)✔$(DEFAULT) Networks $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)' | tr ':' ','): $(GREEN)Deleted$(DEFAULT)"; docker network rm $$(docker network ls --format "{{.ID}}: {{.Name}}" | grep -v -E '(bridge|host|none)') >>$(MSSG_DIR) 2>>$(MSSG_DIR) || true
-	@rm -rf $(ENVS_BONUS)
-	@echo -e "$(GREEN)✔$(DEFAULT) Envs: $(GREEN)Deleted$(DEFAULT)"
-	@rm -rf $(VOLUMES_DIR)
-	@echo -e "$(GREEN)✔$(DEFAULT) Volumes: $(GREEN)Deleted$(DEFAULT)"
-	@rm -rf $(VOLUME_REF)
-	@echo -e "$(GREEN)✔$(DEFAULT) Symlink: $(GREEN)Deleted$(DEFAULT)"
+	$(call clean_docker)
+	@rm -rf $(ENVS_BONUS) && echo -e "$(GREEN)✔$(DEFAULT) Envs: $(GREEN)Deleted$(DEFAULT)"
+	@rm -rf $(VOLUMES_DIR) && echo -e "$(GREEN)✔$(DEFAULT) Volumes: $(GREEN)Deleted$(DEFAULT)"
+	@rm -rf $(VOLUME_REF) && echo -e "$(GREEN)✔$(DEFAULT) Symlink: $(GREEN)Deleted$(DEFAULT)"
 
 bonus-re: bonus-down bonus-up
 
@@ -228,7 +208,6 @@ $(ENV_WORDPRESS_BONUS):
 	@echo -e "ADMIN_USER=$(ADMIN_USER)" >> $(ENV_WORDPRESS_BONUS)
 	@echo -e "ADMIN_PASS=$(ADMIN_PASS)" >> $(ENV_WORDPRESS_BONUS)
 	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS_BONUS)
-	@echo -e "DB_HOST=$(DB_HOST)" >> $(ENV_WORDPRESS_BONUS)
 
 
 ###################################################################################################################################
@@ -263,4 +242,6 @@ CYAN	:= \033[36;1m
 WHITE	:= \033[37;1m
 DEFAULT	:= \033[0m
 
-.PHONY : all clean re up down ls logs host git logs-wp logs-nginx logs-mariadb prune
+.PHONY : all clean re up down ls logs host git logs-wp logs-nginx logs-mariadb prune \
+	bonus bonus-up bonus-down bonus-logs bonus-logs-wp bonus-logs-nginx bonus-logs-mariadb \
+	bonus-clean bonus-re

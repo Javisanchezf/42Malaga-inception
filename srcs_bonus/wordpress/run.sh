@@ -6,7 +6,7 @@ YELLOW='\033[0;33m'
 NC='\033[0m'
 
 # Wait for the database to be available
-while ! mariadb -h$DB_HOST -u$DB_USER -p$DB_PASS $DB_NAME &>/dev/null; do
+while ! mariadb -hmariadb -u$DB_USER -p$DB_PASS $DB_NAME &>/dev/null; do
     echo -e "${YELLOW}Waiting for the database to be available...${NC}"
     sleep 2
 done
@@ -30,7 +30,7 @@ if ! [ -f /domains/$DOMAIN_NAME/public_html/wp-config.php ]; then
     --dbname="$DB_NAME" \
     --dbuser="$DB_USER" \
     --dbpass="$DB_PASS" \
-    --dbhost="$DB_HOST" \
+    --dbhost=mariadb \
     --dbcharset=utf8mb4 \
     --dbcollate=utf8mb4_general_ci \
     --extra-php <<PHP
