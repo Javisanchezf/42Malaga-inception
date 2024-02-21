@@ -65,6 +65,7 @@ up: $(ENVS) $(VOLUME_REF) $(VOLUMES)
 
 down: $(ENVS)
 	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml down --volumes --remove-orphans
+	@rm -rf $(VOLUMES_DIR)
 
 logs:
 	@$(IMPORTS) docker-compose -f ./srcs/docker-compose.yml logs
@@ -176,6 +177,7 @@ bonus-up: $(ENVS_BONUS) $(VOLUME_REF) $(VOLUMES)
 
 bonus-down: $(ENVS_BONUS)
 	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml down --volumes --remove-orphans
+	@rm -rf $(VOLUMES_DIR)
 
 bonus-logs:
 	@$(IMPORTS) docker-compose -f ./srcs_bonus/docker-compose.yml logs
