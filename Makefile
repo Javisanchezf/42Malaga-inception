@@ -47,16 +47,14 @@ BONUS_DOCKER_COMPOSE = export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI
 
 define print_commands
 	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║═══════════════════════════════╗$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) To see the containers logs                             $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   To see the containers, images and networks             $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs $(BLUE) To view the containers logs                            $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make ls $(BLUE)   To view the containers, images and networks            $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make down $(BLUE) Stop all the services in docker compose                $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make clean $(BLUE)Remove crts, containers, images, volumes and networks  $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make re $(BLUE)   Restart the docker compose                             $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make host $(BLUE) Put the domain name in the host file                   $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)║   $(MAGENTA)make prune $(BLUE) Remove all unused data in docker                      $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make logs-wp $(BLUE)To see the wordpress container logs                  $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make logs-nginx $(BLUE)To see the nginx container logs                   $(GREEN)║$(DEFAULT)"
-	@echo -e "$(GREEN)║   $(MAGENTA)make logs-mariadb $(BLUE)To see the mariadb container logs               $(GREEN)║$(DEFAULT)"
+	@echo -e "$(GREEN)║   $(MAGENTA)make logs service=___$(BLUE) To view the logs of a specific container    $(GREEN)║$(DEFAULT)"
 	@echo -e "$(GREEN)╚═════════════════════════════════════════════════════════════════════╝$(DEFAULT)\n"
 endef
 
@@ -73,7 +71,7 @@ endef
 all: host up
 
 up: $(ENVS) $(VOLUME_REF) $(VOLUMES)
-	# @$(DOCKER_COMPOSE) up --build -d --remove-orphans
+	@$(DOCKER_COMPOSE) up --build -d --remove-orphans
 	$(call print_commands)
 
 down: $(ENVS)
@@ -81,13 +79,7 @@ down: $(ENVS)
 	@rm -rf $(VOLUMES_DIR)
 
 logs:
-	@$(DOCKER_COMPOSE) logs
-logs-wp:
-	@$(DOCKER_COMPOSE) logs wordpress
-logs-nginx:
-	@$(DOCKER_COMPOSE) logs nginx
-logs-mariadb:
-	@$(DOCKER_COMPOSE) mariadb
+	@$(DOCKER_COMPOSE) logs $(service)
 
 ls:
 	@echo -e "\n$(BLUE)CONTAINERS:$(DEFAULT)" && docker ps -a
@@ -168,13 +160,7 @@ bonus-down: $(ENVS_BONUS)
 	@rm -rf $(VOLUMES_DIR)
 
 bonus-logs:
-	@$(BONUS_DOCKER_COMPOSE) logs
-bonus-logs-wp:
-	@$(BONUS_DOCKER_COMPOSE) logs wordpress
-bonus-logs-nginx:
-	@$(BONUS_DOCKER_COMPOSE) logs nginx
-bonus-logs-mariadb:
-	@$(BONUS_DOCKER_COMPOSE) logs mariadb
+	@$(BONUS_DOCKER_COMPOSE) logs $(service)
 
 bonus-clean: bonus-down
 	$(call clean_docker)

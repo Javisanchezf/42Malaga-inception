@@ -1,4 +1,4 @@
-# Wordpress + PHP on Alpine Linux
+# Redis Object Cache on Alpine Linux
 FROM alpine:3.19
 
 # Set the TERM environment variable to make sure that the terminal is set up correctly

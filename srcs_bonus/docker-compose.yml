@@ -19,7 +19,7 @@ services:
     env_file:
       - .env_nginx
     volumes:
-      - wp-data:/domains/${DOMAIN_NAME}/public_html
+      - wp-data:/domains
     restart: always
 
   mariadb:
@@ -47,7 +47,7 @@ services:
     env_file:
       - .env_wordpress
     volumes:
-      - wp-data:/domains/${DOMAIN_NAME}/public_html
+      - wp-data:/domains
     restart: always
 
   redis:
@@ -58,9 +58,21 @@ services:
     networks:
       - inception
     volumes:
-      - wp-data:/domains/${DOMAIN_NAME}/public_html
+      - wp-data:/domains
     restart: always
 
+  website:
+    container_name: website
+    build:
+      context: ./website/.
+      args:
+        - DOMAIN_NAME=${DOMAIN_NAME}
+    image: website-alpine
+    networks:
+      - inception
+    volumes:
+      - wp-data:/domains
+    restart: always
 
 volumes:
   wp-data:
