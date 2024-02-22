@@ -78,7 +78,7 @@ volumes:
   wp-data:
     driver_opts:
       type: none
-      device: /home/${ALUMNI}/data/volumes/wp
+      device: /home/${ALUMNI}/data/volumes/web
       o: bind
   db-data:
     driver_opts:
