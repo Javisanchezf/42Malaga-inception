@@ -73,6 +73,19 @@ services:
     volumes:
       - wp-data:/domains
     restart: always
+  
+  adminer:
+    container_name: adminer
+    build:
+      context: ./adminer/.
+    image: adminer-alpine
+    networks:
+      - inception
+    env_file:
+      - .env_website
+    volumes:
+      - wp-data:/domains
+    restart: always
 
 volumes:
   wp-data:
