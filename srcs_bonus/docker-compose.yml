@@ -65,11 +65,11 @@ services:
     container_name: website
     build:
       context: ./website/.
-      args:
-        - DOMAIN_NAME=${DOMAIN_NAME}
     image: website-alpine
     networks:
       - inception
+    env_file:
+      - .env_website
     volumes:
       - wp-data:/domains
     restart: always

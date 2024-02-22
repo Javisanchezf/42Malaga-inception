@@ -21,6 +21,25 @@ else
     echo -e "${YELLOW}Configuration file for $DOMAIN_NAME already exists${NC}"
 fi
 
+# Create SSL certificate for the static website
+if [ ! -f /etc/nginx/ssl/bonus.$DOMAIN_NAME.key ] || [ ! -f /etc/nginx/ssl/bonus.$DOMAIN_NAME.crt ]; then
+    echo -e "${GREEN}Creating SSL certificate for bonus.$DOMAIN_NAME...${NC}"
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/bonus.$DOMAIN_NAME.key -out /etc/nginx/ssl/bonus.$DOMAIN_NAME.crt -subj "/C=$CRT_COUNTRY/L=$CRT_LOCATION/O=$CRT_ORG/OU=$CRT_ORG_UNITY/CN=bonus.$DOMAIN_NAME"
+else
+    echo -e "${YELLOW}SSL certificate for bonus.$DOMAIN_NAME already exists${NC}"
+fi
+
+# Create nginx configuration file for the static website
+if [ ! -f /etc/nginx/http.d/bonus.$DOMAIN_NAME.conf ]; then
+    echo -e "${GREEN}Creating nginx configuration file for bonus.$DOMAIN_NAME...${NC}"
+    tmp=$DOMAIN_NAME
+    DOMAIN_NAME=bonus.$tmp
+    envsubst '$DOMAIN_NAME' < /nginx_template.conf > /etc/nginx/http.d/$DOMAIN_NAME.conf
+    DOMAIN_NAME=$tmp
+else
+    echo -e "${YELLOW}Configuration file for bonus.$DOMAIN_NAME already exists${NC}"
+fi
+
 # Start nginx
 if pgrep nginx > /dev/null
 then

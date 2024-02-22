@@ -42,8 +42,8 @@ ENV_NGINX=srcs/.env_nginx
 ENV_WORDPRESS=srcs/.env_wordpress
 ENVS = $(ENV_MARIADB) $(ENV_NGINX) $(ENV_WORDPRESS)
 
-DOCKER_COMPOSE = export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI); docker-compose -f ./srcs/docker-compose.yml
-BONUS_DOCKER_COMPOSE = export DOMAIN_NAME=$(DOMAIN_NAME); export ALUMNI=$(ALUMNI); docker-compose -f ./srcs_bonus/docker-compose.yml
+DOCKER_COMPOSE = export ALUMNI=$(ALUMNI); docker-compose -f ./srcs/docker-compose.yml
+BONUS_DOCKER_COMPOSE = export ALUMNI=$(ALUMNI); docker-compose -f ./srcs_bonus/docker-compose.yml
 
 define print_commands
 	@echo -e "\n$(GREEN)╔════════════════════════════║COMMANDS║═══════════════════════════════╗$(DEFAULT)"
@@ -93,10 +93,10 @@ clean: down
 	@rm -rf $(VOLUME_REF) && echo -e "$(GREEN)✔$(DEFAULT) Symlink: $(GREEN)Deleted$(DEFAULT)"
 
 host:
-	@if ! grep -q "$(DOMAIN_NAME)" /etc/hosts; then \
+	@if ! grep -q "$(DOMAIN_NAME)" /etc/hosts || ! grep -q "www.$(DOMAIN_NAME)" /etc/hosts || ! grep -q "bonus.$(DOMAIN_NAME)" /etc/hosts ; then \
 		echo -e "$(RED)✘$(DEFAULT) Hosts: $(RED)Not found$(DEFAULT)" && \
 		echo -e "$(GREEN)Adding $(DOMAIN_NAME) to /etc/hosts...$(DEFAULT)" && \
-        echo "127.0.0.1 $(DOMAIN_NAME) www.$(DOMAIN_NAME)" >> /etc/hosts; \
+        echo "127.0.0.1 $(DOMAIN_NAME) www.$(DOMAIN_NAME) bonus.$(DOMAIN_NAME)" >> /etc/hosts; \
         echo -e "$(GREEN)✔$(DEFAULT) Hosts: $(GREEN)Updated$(DEFAULT)"; \
     else \
         echo -e "$(GREEN)✔$(DEFAULT) Hosts: $(GREEN)Already up-to-date$(DEFAULT)"; \
@@ -147,7 +147,8 @@ $(VOLUME_REF):
 ENV_MARIADB_BONUS=srcs_bonus/.env_mariadb
 ENV_NGINX_BONUS=srcs_bonus/.env_nginx
 ENV_WORDPRESS_BONUS=srcs_bonus/.env_wordpress
-ENVS_BONUS = $(ENV_MARIADB_BONUS) $(ENV_NGINX_BONUS) $(ENV_WORDPRESS_BONUS)
+ENV_WEBSITE_BONUS=srcs_bonus/.env_website
+ENVS_BONUS = $(ENV_MARIADB_BONUS) $(ENV_NGINX_BONUS) $(ENV_WORDPRESS_BONUS) $(ENV_WEBSITE_BONUS)
 
 bonus: host bonus-up
 
@@ -195,6 +196,9 @@ $(ENV_WORDPRESS_BONUS):
 	@echo -e "ADMIN_PASS=$(ADMIN_PASS)" >> $(ENV_WORDPRESS_BONUS)
 	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS_BONUS)
 
+$(ENV_WEBSITE_BONUS):
+	@echo -e "#WEBSITE" > $(ENV_WEBSITE_BONUS)
+	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_WEBSITE_BONUS)
 
 ###################################################################################################################################
 
