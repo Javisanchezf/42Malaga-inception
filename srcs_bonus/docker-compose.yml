@@ -95,8 +95,8 @@ services:
     image: ftp-alpine
     networks:
       - inception
-    # env_file:
-    #   - .env_ftp
+    env_file:
+      - .env_ftp
     volumes:
       - wp-data:/domains
     ports:

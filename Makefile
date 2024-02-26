@@ -22,6 +22,9 @@ ADMIN_USER=$(ALUMNI)
 ADMIN_PASS:=$(shell openssl rand -base64 12)
 ADMIN_EMAIL=$(ALUMNI)@student.42malaga.com
 
+#FTP
+FTP_USER=$(ALUMNI)
+FTP_PASS:=$(shell openssl rand -base64 12)
 
 #OTHER
 MSSG_DIR=/dev/null
@@ -146,8 +149,9 @@ $(VOLUME_REF):
 ENV_MARIADB_BONUS=srcs_bonus/.env_mariadb
 ENV_NGINX_BONUS=srcs_bonus/.env_nginx
 ENV_WORDPRESS_BONUS=srcs_bonus/.env_wordpress
-ENV_WEBSITE_BONUS=srcs_bonus/.env_website
-ENVS_BONUS = $(ENV_MARIADB_BONUS) $(ENV_NGINX_BONUS) $(ENV_WORDPRESS_BONUS) $(ENV_WEBSITE_BONUS)
+ENV_WEBSITE=srcs_bonus/.env_website
+ENV_FTP=srcs_bonus/.env_ftp
+ENVS_BONUS = $(ENV_MARIADB_BONUS) $(ENV_NGINX_BONUS) $(ENV_WORDPRESS_BONUS) $(ENV_WEBSITE) $(ENV_FTP)
 
 bonus: host bonus-up
 
@@ -194,9 +198,14 @@ $(ENV_WORDPRESS_BONUS):
 	@echo -e "ADMIN_PASS=$(ADMIN_PASS)" >> $(ENV_WORDPRESS_BONUS)
 	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS_BONUS)
 
-$(ENV_WEBSITE_BONUS):
-	@echo -e "#WEBSITE" > $(ENV_WEBSITE_BONUS)
-	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_WEBSITE_BONUS)
+$(ENV_WEBSITE):
+	@echo -e "#WEBSITE" > $(ENV_WEBSITE)
+	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_WEBSITE)
+
+$(ENV_FTP):
+	@echo -e "#FTP" > $(ENV_FTP)
+	@echo -e "FTP_USER=$(FTP_USER)" >> $(ENV_FTP)
+	@echo -e "FTP_PASS=$(FTP_PASS)" >> $(ENV_FTP)
 
 ###################################################################################################################################
 
