@@ -17,7 +17,7 @@ services:
     networks:
       - inception
     env_file:
-      - .env_nginx
+      - .env_general
     volumes:
       - wp-data:/domains
     restart: always
@@ -30,7 +30,7 @@ services:
     networks:
       - inception
     env_file:
-      - .env_mariadb
+      - .env_db
     volumes:
       - db-data:/var/lib/mysql
     restart: always
@@ -45,7 +45,9 @@ services:
     networks:
       - inception
     env_file:
+      - .env_general
       - .env_wordpress
+      - .env_db
     volumes:
       - wp-data:/domains
     restart: always

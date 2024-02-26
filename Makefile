@@ -40,11 +40,12 @@ VOLUMES = $(WP_VOLUME) $(DB_VOLUME)
 VOLUME_REF = ./volumes
 
 #ENVS
-ENV_MARIADB=srcs/.env_mariadb
-ENV_NGINX=srcs/.env_nginx
+ENV_GENERAL=srcs/.env_general
+ENV_DB=srcs/.env_db
 ENV_WORDPRESS=srcs/.env_wordpress
-ENVS = $(ENV_MARIADB) $(ENV_NGINX) $(ENV_WORDPRESS)
+ENVS = $(ENV_DB) $(ENV_GENERAL) $(ENV_WORDPRESS)
 
+#DOCKER COMPOSE
 DOCKER_COMPOSE = export ALUMNI=$(ALUMNI); docker-compose -f ./srcs/docker-compose.yml
 BONUS_DOCKER_COMPOSE = export ALUMNI=$(ALUMNI); docker-compose -f ./srcs_bonus/docker-compose.yml
 
@@ -109,27 +110,23 @@ re: down up
 prune:
 	@docker system prune -a -f
 
-$(ENV_MARIADB):
-	@echo -e "#MARIADB" > $(ENV_MARIADB)
-	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_MARIADB)
-	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_MARIADB)
-	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_MARIADB)
-	@echo -e "DB_ROOT_PASS=$(DB_ROOT_PASS)" >> $(ENV_MARIADB)
+$(ENV_DB):
+	@echo -e "#MARIADB" > $(ENV_DB)
+	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_DB)
+	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_DB)
+	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_DB)
+	@echo -e "DB_ROOT_PASS=$(DB_ROOT_PASS)" >> $(ENV_DB)
 
-$(ENV_NGINX):
-	@echo -e "#NGINX" > $(ENV_NGINX)
-	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_NGINX)
-	@echo -e "CRT_COUNTRY=$(CRT_COUNTRY)" >> $(ENV_NGINX)
-	@echo -e "CRT_LOCATION=$(CRT_LOCATION)" >> $(ENV_NGINX)
-	@echo -e "CRT_ORG=$(CRT_ORG)" >> $(ENV_NGINX)
-	@echo -e "CRT_ORG_UNITY=$(CRT_ORG_UNITY)" >> $(ENV_NGINX)
+$(ENV_GENERAL):
+	@echo -e "#GENERAL DATA" > $(ENV_GENERAL)
+	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_GENERAL)
+	@echo -e "CRT_COUNTRY=$(CRT_COUNTRY)" >> $(ENV_GENERAL)
+	@echo -e "CRT_LOCATION=$(CRT_LOCATION)" >> $(ENV_GENERAL)
+	@echo -e "CRT_ORG=$(CRT_ORG)" >> $(ENV_GENERAL)
+	@echo -e "CRT_ORG_UNITY=$(CRT_ORG_UNITY)" >> $(ENV_GENERAL)
 	
 $(ENV_WORDPRESS):
 	@echo -e "#WORDPRESS" > $(ENV_WORDPRESS)
-	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_WORDPRESS)
-	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_WORDPRESS)
-	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_WORDPRESS)
-	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_WORDPRESS)
 	@echo -e "ADMIN_USER=$(ADMIN_USER)" >> $(ENV_WORDPRESS)
 	@echo -e "ADMIN_PASS=$(ADMIN_PASS)" >> $(ENV_WORDPRESS)
 	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS)
@@ -146,12 +143,11 @@ $(VOLUME_REF):
 ###################################################################################################################################
 
 #BONUS
-ENV_MARIADB_BONUS=srcs_bonus/.env_mariadb
-ENV_NGINX_BONUS=srcs_bonus/.env_nginx
+ENV_GENERAL_BONUS=srcs_bonus/.env_general
+ENV_DB_BONUS=srcs_bonus/.env_db
 ENV_WORDPRESS_BONUS=srcs_bonus/.env_wordpress
-ENV_WEBSITE=srcs_bonus/.env_website
 ENV_FTP=srcs_bonus/.env_ftp
-ENVS_BONUS = $(ENV_MARIADB_BONUS) $(ENV_NGINX_BONUS) $(ENV_WORDPRESS_BONUS) $(ENV_WEBSITE) $(ENV_FTP)
+ENVS_BONUS = $(ENV_GENERAL_BONUS) $(ENV_DB_BONUS) $(ENV_WORDPRESS_BONUS) $(ENV_FTP)
 
 bonus: host bonus-up
 
@@ -173,34 +169,26 @@ bonus-clean: bonus-down
 
 bonus-re: bonus-down bonus-up
 
-$(ENV_MARIADB_BONUS):
-	@echo -e "#MARIADB" > $(ENV_MARIADB_BONUS)
-	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_MARIADB_BONUS)
-	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_MARIADB_BONUS)
-	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_MARIADB_BONUS)
-	@echo -e "DB_ROOT_PASS=$(DB_ROOT_PASS)" >> $(ENV_MARIADB_BONUS)
+$(ENV_GENERAL_BONUS):
+	@echo -e "#NGINX" > $(ENV_GENERAL_BONUS)
+	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_GENERAL_BONUS)
+	@echo -e "CRT_COUNTRY=$(CRT_COUNTRY)" >> $(ENV_GENERAL_BONUS)
+	@echo -e "CRT_LOCATION=$(CRT_LOCATION)" >> $(ENV_GENERAL_BONUS)
+	@echo -e "CRT_ORG=$(CRT_ORG)" >> $(ENV_GENERAL_BONUS)
+	@echo -e "CRT_ORG_UNITY=$(CRT_ORG_UNITY)" >> $(ENV_GENERAL_BONUS)
 
-$(ENV_NGINX_BONUS):
-	@echo -e "#NGINX" > $(ENV_NGINX_BONUS)
-	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_NGINX_BONUS)
-	@echo -e "CRT_COUNTRY=$(CRT_COUNTRY)" >> $(ENV_NGINX_BONUS)
-	@echo -e "CRT_LOCATION=$(CRT_LOCATION)" >> $(ENV_NGINX_BONUS)
-	@echo -e "CRT_ORG=$(CRT_ORG)" >> $(ENV_NGINX_BONUS)
-	@echo -e "CRT_ORG_UNITY=$(CRT_ORG_UNITY)" >> $(ENV_NGINX_BONUS)
+$(ENV_DB_BONUS):
+	@echo -e "#MARIADB" > $(ENV_DB_BONUS)
+	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_DB_BONUS)
+	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_DB_BONUS)
+	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_DB_BONUS)
+	@echo -e "DB_ROOT_PASS=$(DB_ROOT_PASS)" >> $(ENV_DB_BONUS)
 
 $(ENV_WORDPRESS_BONUS):
 	@echo -e "#WORDPRESS" > $(ENV_WORDPRESS_BONUS)
-	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_WORDPRESS_BONUS)
-	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_WORDPRESS_BONUS)
-	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_WORDPRESS_BONUS)
-	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_WORDPRESS_BONUS)
 	@echo -e "ADMIN_USER=$(ADMIN_USER)" >> $(ENV_WORDPRESS_BONUS)
 	@echo -e "ADMIN_PASS=$(ADMIN_PASS)" >> $(ENV_WORDPRESS_BONUS)
 	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS_BONUS)
-
-$(ENV_WEBSITE):
-	@echo -e "#WEBSITE" > $(ENV_WEBSITE)
-	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_WEBSITE)
 
 $(ENV_FTP):
 	@echo -e "#FTP" > $(ENV_FTP)

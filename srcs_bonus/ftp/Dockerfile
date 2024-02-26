@@ -8,14 +8,6 @@ ENV TERM xterm
 RUN apk update && apk upgrade && apk add --no-cache \
     vsftpd
 
-# # Create the FTP user and the directory for the FTP server
-# RUN adduser -D ftpuser && \
-#     echo "ftpuser:ftpuser" | chpasswd && \
-#     mkdir -p /home/ftpuser && \
-#     chown -R ftpuser:ftpuser /home/ftpuser && \
-#     mkdir -p /domains && \
-#     chown -R ftpuser:ftpuser /domains
-
 # Configure the FTP server
 RUN sed -i "s/#local_enable=YES/local_enable=YES/" /etc/vsftpd/vsftpd.conf && \
     sed -i "s/#write_enable=YES/write_enable=YES/" /etc/vsftpd/vsftpd.conf && \
