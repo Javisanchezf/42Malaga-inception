@@ -76,7 +76,6 @@ up: $(ENVS) $(VOLUME_REF) $(VOLUMES)
 
 down: $(ENVS)
 	@$(DOCKER_COMPOSE) down --volumes --remove-orphans
-	@rm -rf $(VOLUMES_DIR)
 
 logs:
 	@$(DOCKER_COMPOSE) logs $(service)
@@ -158,7 +157,6 @@ bonus-up: $(ENVS_BONUS) $(VOLUME_REF) $(VOLUMES)
 
 bonus-down: $(ENVS_BONUS)
 	@$(BONUS_DOCKER_COMPOSE) down --volumes --remove-orphans
-	@rm -rf $(VOLUMES_DIR)
 
 bonus-logs:
 	@$(BONUS_DOCKER_COMPOSE) logs $(service)

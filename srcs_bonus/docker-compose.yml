@@ -88,6 +88,22 @@ services:
       - db-data:/var/lib/mysql
     restart: always
 
+  ftp:
+    container_name: ftp
+    build:
+      context: ./ftp/.
+    image: ftp-alpine
+    networks:
+      - inception
+    # env_file:
+    #   - .env_ftp
+    volumes:
+      - wp-data:/domains
+    ports:
+      - "21:21"
+      - "21000:21000"
+    restart: always
+
 volumes:
   wp-data:
     driver_opts:
