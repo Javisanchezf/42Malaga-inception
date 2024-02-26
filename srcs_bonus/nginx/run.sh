@@ -5,10 +5,14 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
+export CRT=$DOMAIN_NAME.crt
+export KEY=$DOMAIN_NAME.key
+export FAST_CGI_PASS=wordpress:9000
+
 # Create SSL certificate
-if [ ! -f /etc/nginx/ssl/$DOMAIN_NAME.key ] || [ ! -f /etc/nginx/ssl/$DOMAIN_NAME.crt ]; then
+if [ ! -f /etc/nginx/ssl/$KEY ] || [ ! -f /etc/nginx/ssl/$CRT ]; then
     echo -e "${GREEN}Creating SSL certificate for $DOMAIN_NAME...${NC}"
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/$DOMAIN_NAME.key -out /etc/nginx/ssl/$DOMAIN_NAME.crt -subj "/C=$CRT_COUNTRY/L=$CRT_LOCATION/O=$CRT_ORG/OU=$CRT_ORG_UNITY/CN=$DOMAIN_NAME"
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/$KEY -out /etc/nginx/ssl/$CRT -subj "/C=$CRT_COUNTRY/L=$CRT_LOCATION/O=$CRT_ORG/OU=$CRT_ORG_UNITY/CN=$DOMAIN_NAME"
 else
     echo -e "${YELLOW}SSL certificate for $DOMAIN_NAME already exists${NC}"
 fi
@@ -16,52 +20,38 @@ fi
 # Create nginx configuration file
 if [ ! -f /etc/nginx/http.d/$DOMAIN_NAME.conf ]; then
     echo -e "${GREEN}Creating nginx configuration file for $DOMAIN_NAME...${NC}"
-    envsubst '$DOMAIN_NAME' < /nginx_template.conf > /etc/nginx/http.d/$DOMAIN_NAME.conf
+    envsubst '$DOMAIN_NAME $CRT $KEY $FAST_CGI_PASS' < /nginx_template.conf > /etc/nginx/http.d/$DOMAIN_NAME.conf
 else
     echo -e "${YELLOW}Configuration file for $DOMAIN_NAME already exists${NC}"
 fi
 
 ####################################################################################################
 
-# Create SSL certificate for the static website
-if [ ! -f /etc/nginx/ssl/bonus.$DOMAIN_NAME.key ] || [ ! -f /etc/nginx/ssl/bonus.$DOMAIN_NAME.crt ]; then
-    echo -e "${GREEN}Creating SSL certificate for bonus.$DOMAIN_NAME...${NC}"
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/bonus.$DOMAIN_NAME.key -out /etc/nginx/ssl/bonus.$DOMAIN_NAME.crt -subj "/C=$CRT_COUNTRY/L=$CRT_LOCATION/O=$CRT_ORG/OU=$CRT_ORG_UNITY/CN=bonus.$DOMAIN_NAME"
-else
-    echo -e "${YELLOW}SSL certificate for bonus.$DOMAIN_NAME already exists${NC}"
-fi
-
 # Create nginx configuration file for the static website
-if [ ! -f /etc/nginx/http.d/bonus.$DOMAIN_NAME.conf ]; then
-    echo -e "${GREEN}Creating nginx configuration file for bonus.$DOMAIN_NAME...${NC}"
+if [ ! -f /etc/nginx/http.d/web.$DOMAIN_NAME.conf ]; then
+    echo -e "${GREEN}Creating nginx configuration file for web.$DOMAIN_NAME...${NC}"
     tmp=$DOMAIN_NAME
-    DOMAIN_NAME=bonus.$tmp
-    envsubst '$DOMAIN_NAME' < /nginx_template.conf > /etc/nginx/http.d/$DOMAIN_NAME.conf
-    sed -i "s/wordpress:9000/adminer:9001/g" /etc/nginx/http.d/$DOMAIN_NAME.conf
+    DOMAIN_NAME=web.$tmp
+    envsubst '$DOMAIN_NAME $CRT $KEY $FAST_CGI_PASS' < /nginx_template.conf > /etc/nginx/http.d/$DOMAIN_NAME.conf
+    # sed -i "s/wordpress:9000/adminer:9001/g" /etc/nginx/http.d/$DOMAIN_NAME.conf
     DOMAIN_NAME=$tmp
 else
-    echo -e "${YELLOW}Configuration file for bonus.$DOMAIN_NAME already exists${NC}"
+    echo -e "${YELLOW}Configuration file for web.$DOMAIN_NAME already exists${NC}"
 fi
 
 ####################################################################################################
-# if [ ! -f /etc/nginx/ssl/adminer.$DOMAIN_NAME.key ] || [ ! -f /etc/nginx/ssl/adminer.$DOMAIN_NAME.crt ]; then
-#     echo -e "${GREEN}Creating SSL certificate for adminer.$DOMAIN_NAME...${NC}"
-#     openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/adminer.$DOMAIN_NAME.key -out /etc/nginx/ssl/adminer.$DOMAIN_NAME.crt -subj "/C=$CRT_COUNTRY/L=$CRT_LOCATION/O=$CRT_ORG/OU=$CRT_ORG_UNITY/CN=adminer.$DOMAIN_NAME"
-# else
-#     echo -e "${YELLOW}SSL certificate for adminer.$DOMAIN_NAME already exists${NC}"
-# fi
 
 # # Create nginx configuration file for the static website
-# if [ ! -f /etc/nginx/http.d/adminer.$DOMAIN_NAME.conf ]; then
-#     echo -e "${GREEN}Creating nginx configuration file for adminer.$DOMAIN_NAME...${NC}"
-#     tmp=$DOMAIN_NAME
-#     DOMAIN_NAME=adminer.$tmp
-#     envsubst '$DOMAIN_NAME' < /nginx_template.conf > /etc/nginx/http.d/$DOMAIN_NAME.conf
-#     DOMAIN_NAME=$tmp
-#     sed -i "s/wordpress:9000/adminer:9001/g" /etc/nginx/http.d/adminer.$DOMAIN_NAME.conf
-# else
-#     echo -e "${YELLOW}Configuration file for adminer.$DOMAIN_NAME already exists${NC}"
-# fi
+if [ ! -f /etc/nginx/http.d/adminer.$DOMAIN_NAME.conf ]; then
+    echo -e "${GREEN}Creating nginx configuration file for adminer.$DOMAIN_NAME...${NC}"
+    tmp=$DOMAIN_NAME
+    DOMAIN_NAME=adminer.$tmp
+    FAST_CGI_PASS=adminer:9001
+    envsubst '$DOMAIN_NAME $CRT $KEY $FAST_CGI_PASS' < /nginx_template.conf > /etc/nginx/http.d/$DOMAIN_NAME.conf
+    DOMAIN_NAME=$tmp
+else
+    echo -e "${YELLOW}Configuration file for adminer.$DOMAIN_NAME already exists${NC}"
+fi
 
 # Start nginx
 if pgrep nginx > /dev/null

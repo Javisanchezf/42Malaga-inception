@@ -85,6 +85,7 @@ services:
       - .env_website
     volumes:
       - wp-data:/domains
+      - db-data:/var/lib/mysql
     restart: always
 
 volumes:
