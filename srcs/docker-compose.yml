@@ -12,8 +12,6 @@ services:
     image: nginx-tls-alpine
     ports:
       - "443:443"
-    depends_on:
-      - wordpress
     networks:
       - inception
     env_file:

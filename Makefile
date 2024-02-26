@@ -26,6 +26,9 @@ ADMIN_EMAIL=$(ALUMNI)@student.42malaga.com
 FTP_USER=$(ALUMNI)
 FTP_PASS:=$(shell openssl rand -base64 12)
 
+#REDIS
+REDIS_PASS:=$(shell openssl rand -base64 12)
+
 #OTHER
 MSSG_DIR=/dev/null
 
@@ -110,13 +113,6 @@ re: down up
 prune:
 	@docker system prune -a -f
 
-$(ENV_DB):
-	@echo -e "#MARIADB" > $(ENV_DB)
-	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_DB)
-	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_DB)
-	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_DB)
-	@echo -e "DB_ROOT_PASS=$(DB_ROOT_PASS)" >> $(ENV_DB)
-
 $(ENV_GENERAL):
 	@echo -e "#GENERAL DATA" > $(ENV_GENERAL)
 	@echo -e "DOMAIN_NAME=$(DOMAIN_NAME)" >> $(ENV_GENERAL)
@@ -124,7 +120,14 @@ $(ENV_GENERAL):
 	@echo -e "CRT_LOCATION=$(CRT_LOCATION)" >> $(ENV_GENERAL)
 	@echo -e "CRT_ORG=$(CRT_ORG)" >> $(ENV_GENERAL)
 	@echo -e "CRT_ORG_UNITY=$(CRT_ORG_UNITY)" >> $(ENV_GENERAL)
-	
+
+$(ENV_DB):
+	@echo -e "#MARIADB" > $(ENV_DB)
+	@echo -e "DB_NAME=$(DB_NAME)" >> $(ENV_DB)
+	@echo -e "DB_USER=$(DB_USER)" >> $(ENV_DB)
+	@echo -e "DB_PASS=$(DB_PASS)" >> $(ENV_DB)
+	@echo -e "DB_ROOT_PASS=$(DB_ROOT_PASS)" >> $(ENV_DB)
+
 $(ENV_WORDPRESS):
 	@echo -e "#WORDPRESS" > $(ENV_WORDPRESS)
 	@echo -e "ADMIN_USER=$(ADMIN_USER)" >> $(ENV_WORDPRESS)
@@ -189,6 +192,7 @@ $(ENV_WORDPRESS_BONUS):
 	@echo -e "ADMIN_USER=$(ADMIN_USER)" >> $(ENV_WORDPRESS_BONUS)
 	@echo -e "ADMIN_PASS=$(ADMIN_PASS)" >> $(ENV_WORDPRESS_BONUS)
 	@echo -e "ADMIN_EMAIL=$(ADMIN_EMAIL)" >> $(ENV_WORDPRESS_BONUS)
+	@echo -e "REDIS_PASS=$(REDIS_PASS)" >> $(ENV_WORDPRESS_BONUS)
 
 $(ENV_FTP):
 	@echo -e "#FTP" > $(ENV_FTP)
@@ -227,6 +231,5 @@ CYAN	:= \033[36;1m
 WHITE	:= \033[37;1m
 DEFAULT	:= \033[0m
 
-.PHONY : all clean re up down ls logs host git logs-wp logs-nginx logs-mariadb prune \
-	bonus bonus-up bonus-down bonus-logs bonus-logs-wp bonus-logs-nginx bonus-logs-mariadb \
-	bonus-clean bonus-re
+.PHONY : all clean re up down ls logs host git prune \
+		bonus bonus-up bonus-down bonus-logs bonus-clean bonus-re

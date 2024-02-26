@@ -12,8 +12,6 @@ services:
     image: nginx-tls-alpine
     ports:
       - "443:443"
-    depends_on:
-      - wordpress
     networks:
       - inception
     env_file:
@@ -59,6 +57,8 @@ services:
     image: redis-alpine
     networks:
       - inception
+    env_file:
+      - .env_wordpress
     volumes:
       - wp-data:/domains
     restart: always
@@ -85,6 +85,8 @@ services:
       - inception
     env_file:
       - .env_general
+    depends_on:
+      - mariadb
     volumes:
       - wp-data:/domains
       - db-data:/var/lib/mysql

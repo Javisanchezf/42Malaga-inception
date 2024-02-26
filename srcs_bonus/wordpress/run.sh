@@ -45,7 +45,7 @@ if ! [ -f /domains/$DOMAIN_NAME/public_html/wp-config.php ]; then
     define('WP_MEMORY_LIMIT', '256M');
     define('WP_REDIS_HOST', 'redis');
     define('WP_REDIS_PORT', 6379);
-    define('WP_REDIS_PASSWORD', '42Malaga');
+    define('WP_REDIS_PASSWORD', "$REDIS_PASS");
     define('WP_REDIS_PREFIX', 'redis_');
     define('WP_REDIS_DATABASE', 0);
 PHP
