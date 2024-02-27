@@ -31,19 +31,10 @@ You will virtualize several Docker images, creating them in your new personal vi
 machine. [You can find more information in the subject](https://github.com/Javisanchezf/42Malaga-pdfs/blob/main/inception_subject.pdf).
 
 
-This is the result of the program:
+This is the structure of the program:
 
 <div align = center>
-  <img src="https://github.com/Javisanchezf/42Malaga-inception/blob/main/images/juliainception.webp" width="800"/>
-</div>
-<div align = center>
-  <img src="https://github.com/Javisanchezf/42Malaga-inception/blob/main/images/t2inception.webp" width="800"/>
-</div>
-<div align = center>
-  <img src="https://github.com/Javisanchezf/42Malaga-inception/blob/main/images/earth1inception.webp" width="800"/>
-</div>
-<div align = center>
-  <img src="https://github.com/Javisanchezf/42Malaga-inception/blob/main/images/earth2inception.webp" width="800"/>
+  <img src="media/inception-resume.webp" width="800"/>
 </div>
 
 ## Requirements
