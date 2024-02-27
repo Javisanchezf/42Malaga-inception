@@ -1,8 +1,4 @@
-<div id="header" align = center>
-  <img src="https://github.com/Javisanchezf/media/blob/main/pc-gif.webp" width="200"/>
-</div>
-
-<h1 align = center>42 Malaga Inception</h1>
+<h1 align = center>42 Malaga Inception Alpine version</h1>
 
 > School 42 Málaga cursus project.
 
@@ -15,11 +11,7 @@ This repository contains all archives for the project __inception__ in the __Sch
 	<span> · </span>
 	<a href="#instructions">Instuctions</a>
 	<span> · </span>
-	<a href="#testing">Testing</a>
-	<span> · </span>
-	<a href="#references">References</a>
-	<span> · </span>
-	<a href="#tips">Guide</a>
+	<a href="#guide">Guide</a>
 	<span> · </span>
 	<a href="#license">License</a>
 </h2>
@@ -64,7 +56,7 @@ Before you begin with this project, ensure that you have the following prerequis
 
 To download the repository, go to the console and run:
 ```
-git clone --recursive https://github.com/Javisanchezf/42Malaga-inception.git
+git clone https://github.com/Javisanchezf/42Malaga-inception.git
 cd 42Malaga-inception
 ```
 
@@ -75,42 +67,57 @@ To compile the library, go to its path and run:
 ```
 make
 ```
-
+Or the bonus version:
+```
+make bonus
+```
 ### 3. Cleaning all binary (.o) executable files (.a) and the program
 
-To delete all files generated with make, go to the path and run:
+To delete all files and containers generated with make, go to the path and run:
 ```
-make fclean
+make clean
 ```
-### 4. Using it
-
-
-You can test the inception with different maps, you have several maps to test in the maps folder, try the following:
-```
-?????????????
-```
-
-## Testing
-
-## References
 
 ## Guide
 
-<h3>Understand basic concepts</h3>
-
 ---
-Step 1: Install Docker
+### Step 0: Create the virtual machine
 
-For 42 users in general you can run the following:
+For a virtual machine I recommend in this order:
+- Alpine with XFCE (or other graphical interface): Since it is a minimal image, just what is necessary for this project. The benefits are learning how to use alpine and having a very lightweight VM that can be useful for underpowered computers.
+- Ubuntu: For its ease of installation and use.
+- Debian: Another viable option.
+
+Here I will show how to create a minimal Alpine VM.
+
+1. Download the “Virtual” realease for your processor architecture at https://alpinelinux.org/downloads.
+
+2. Spin up a VM in Oracle VirtualBox with enough RAM(4 - 8) and disk space (10 - 20), the mount the downloaded ISO.
+
+3. Log in with the user root and no password, then run setup-alpine to install Alpine Linux to the disk.
+
+4. Choose sda as the disk, sys as the use case and confirm you want the disk to be erased. Accepting everything else on default is fine.
+
+5. After the installation succeeds, poweroff the VM and unmount the ISO.
+
+6. Run this command to setup the graphical environment and install other needed programs:
 ```
-cd /sgoinfre/shared/42toolbox/
-sh init_docker.sh
+setup-xorg-base xfce4 lightdm-gtk-greeter xfce4-terminal chromium mousepad
 ```
+7. Then run this command, so the graphical interface starts when the system boots up.
+```
+rc-update add lightdm && rc-update add dbus
+```
+8. Finally reboot the system and you have the grafical interface. (If you have problems with chromium try apk add firefox-esr and then run firefox-esr).
 
-For other users [follow this steeps](https://docs.docker.com/get-docker/).
+9. Congratulations! You have a minimal VM.
 
----
-Step 2: Understand basic commands
+Tip initial downloads:
+```
+sed -i 's/#//g' /etc/apk/repositories
+apk add --no-cache firefox-esr docker docker-compose git make
+```
+### Step 1: Understand basic commands
 
 A quick reference for commonly used Docker commands.
 
@@ -147,7 +154,12 @@ You can start with the command:
 docker run hello-world
 ```
 
+### Step 3
+
+Comming soon...
+
 ## License
+
 This work is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 You are free to:
@@ -159,9 +171,4 @@ Under the following terms:
 * NonCommercial: You may not use the material for commercial purposes.
 * ShareAlike: If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
 
-<h3 align = right>Share the content!</h3>
-
-[<img src="https://github.com/Javisanchezf/media/blob/main/whatsapp-icon.png" width="50" height="50" align = right></img>](https://api.whatsapp.com/send?text=Hey!%20Check%20out%20this%20cool%20repository%20I%20found%20on%20Github.%20%0ahttps://github.com/Javisanchezf/42Malaga-inception)
-[<img src="https://github.com/Javisanchezf/media/blob/main/telegram-icon.webp" width="50" height="50" align = right></img>](https://t.me/share/url?url=https://github.com/javisanchezf/42Malaga-inception&text=Hey!%20Check%20out%20this%20cool%20repository%20I%20found%20on%20Github.)
-[<img src="https://github.com/Javisanchezf/media/blob/main/twitter-icon.png" width="50" height="50" align = right></img>](https://twitter.com/intent/tweet?url=https://github.com/Javisanchezf/42Malaga-inception&text=Hey!%20Check%20out%20this%20cool%20repository%20I%20found%20on%20Github)
-[<img src="https://github.com/Javisanchezf/media/blob/main/linkedin-icon.png" width="50" height="50" align = right></img>](https://www.linkedin.com/sharing/share-offsite/?url=https://github.com/javisanchezf/42Malaga-inception)
+<h3 align = right>Thanks for the support!</h3>

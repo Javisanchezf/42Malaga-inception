@@ -8,12 +8,13 @@ ARG DOMAIN_NAME
 
 # Install NGINX and OpenSSL
 RUN apk update && apk upgrade && apk add --no-cache \
-    markdown
+    pandoc
 
 COPY run.sh /run.sh
 COPY README.md .
 RUN chmod +x /run.sh
 
+COPY media media
 # Clean up the package repository
 RUN rm -f /var/cache/apk/*
 
