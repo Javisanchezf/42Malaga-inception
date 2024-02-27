@@ -14,7 +14,7 @@ COPY run.sh /run.sh
 COPY README.md .
 RUN chmod +x /run.sh
 
-COPY media media
+COPY media web_media
 # Clean up the package repository
 RUN rm -f /var/cache/apk/*
 
