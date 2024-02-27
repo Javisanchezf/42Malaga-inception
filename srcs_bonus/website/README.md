@@ -26,7 +26,7 @@ machine. [You can find more information in the subject](https://github.com/Javis
 This is the structure of the program:
 
 <div align = center>
-  <img src="media/inception-resume.webp" width="800"/>
+  <img src="srcs_bonus/website/media/inception-resume.webp" width="800"/>
 </div>
 
 ## Requirements
