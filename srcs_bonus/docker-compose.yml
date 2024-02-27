@@ -108,6 +108,21 @@ services:
       - "21000:21000"
     restart: always
 
+  netdata:
+    container_name: netdata
+    build:
+      context: ./netdata/.
+    image: netdata-alpine
+    networks:
+      - inception
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    # ports:
+    #   - "19999:19999"
+    restart: always
+
 volumes:
   wp-data:
     driver_opts:

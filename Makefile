@@ -29,6 +29,10 @@ FTP_PASS:=$(shell openssl rand -base64 12)
 #REDIS
 REDIS_PASS:=$(shell openssl rand -base64 12)
 
+#NETDATA
+NETDATA_USR=javiersa
+NETDATA_PASS:=$(shell openssl rand -base64 12)
+
 #OTHER
 MSSG_DIR=/dev/null
 
@@ -179,6 +183,8 @@ $(ENV_GENERAL_BONUS):
 	@echo -e "CRT_LOCATION=$(CRT_LOCATION)" >> $(ENV_GENERAL_BONUS)
 	@echo -e "CRT_ORG=$(CRT_ORG)" >> $(ENV_GENERAL_BONUS)
 	@echo -e "CRT_ORG_UNITY=$(CRT_ORG_UNITY)" >> $(ENV_GENERAL_BONUS)
+	@echo -e "NETDATA_USR=$(NETDATA_USR)" >> $(ENV_GENERAL_BONUS)
+	@echo -e "NETDATA_PASS=$(NETDATA_PASS)" >> $(ENV_GENERAL_BONUS)
 
 $(ENV_DB_BONUS):
 	@echo -e "#MARIADB" > $(ENV_DB_BONUS)

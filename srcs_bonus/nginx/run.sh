@@ -53,6 +53,22 @@ else
     echo -e "${YELLOW}Configuration file for adminer.$DOMAIN_NAME already exists${NC}"
 fi
 
+####################################################################################################
+
+if [ ! -f /etc/nginx/http.d/netdata.$DOMAIN_NAME.conf ]; then
+    echo -e "${GREEN}Creating nginx configuration file for netdata.$DOMAIN_NAME...${NC}"
+    tmp=$DOMAIN_NAME
+    DOMAIN_NAME=netdata.$tmp
+    envsubst '$DOMAIN_NAME $CRT $KEY' < /netdata.conf > /etc/nginx/http.d/$DOMAIN_NAME.conf
+    DOMAIN_NAME=$tmp
+else
+    echo -e "${YELLOW}Configuration file for netdata.$DOMAIN_NAME already exists${NC}"
+fi
+
+encrypted_password=$(openssl passwd -apr1 "$NETDATA_PASS")
+echo "$NETDATA_USR:$encrypted_password" >> /etc/nginx/.htpasswd
+
+# ###############################################################################################
 # Start nginx
 if pgrep nginx > /dev/null
 then

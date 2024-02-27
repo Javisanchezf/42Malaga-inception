@@ -15,12 +15,14 @@ RUN mkdir -p /etc/nginx/ssl
 
 # Configure NGINX with the www-data user
 RUN adduser -D -H -S -G www-data www-data && \
-    sed -i 's/user nginx;/user www-data;/' /etc/nginx/nginx.conf && \
-    sed -i 's/keepalive_timeout 65;/keepalive_timeout 5;/' /etc/nginx/nginx.conf
+    sed -i 's/user nginx;/user www-data;/' /etc/nginx/nginx.conf
 
 # Copy the script that will configurate and start NGINX
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
+
+# Copy the NGINX configuration file for netdata
+COPY netdata.conf .
 
 # Copy the NGINX template configuration file
 COPY nginx_template.conf .
