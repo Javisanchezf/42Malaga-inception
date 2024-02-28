@@ -71,12 +71,20 @@ Or the bonus version:
 ```
 make bonus
 ```
-### 3. Cleaning all binary (.o) executable files (.a) and the program
+### 3. Cleaning all the images, containers, volumes and env files
 
 To delete all files and containers generated with make, go to the path and run:
 ```
 make clean
 ```
+### 4. Acces
+By default:
+- Wordpress: https://javiersa.42.fr
+- Adminer: https://adminer.javiersa.42.fr
+- Netdata: https://netdata.javiersa.42.fr
+- Static website: https://web.javiersa.42.fr
+- Redis: https://javiersa.42.fr/wp-admin/options-general.php?page=redis.cache
+- FTP: ftp or lftp javiersa@localhost
 
 ## Guide
 

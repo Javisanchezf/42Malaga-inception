@@ -11,10 +11,5 @@ else
 fi
 
 # Start vsftpd
-if pgrep vsftpd > /dev/null
-then
-    echo "vsftpd is already running"
-else
-    echo "Starting vsftpd"
-    /usr/sbin/vsftpd /etc/vsftpd/vsftpd.conf
-fi
+echo "Starting vsftpd"
+/usr/sbin/vsftpd /etc/vsftpd/vsftpd.conf

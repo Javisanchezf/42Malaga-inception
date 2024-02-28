@@ -68,10 +68,7 @@ else
     echo -e "${GREEN}WordPress is already installed. Skipping installation...${NC}"
 fi
 
+
 # Start PHP-FPM
-if pgrep php-fpm; then
-    echo -e "${RED}PHP-FPM is already running${NC}"
-else
-    echo -e "${GREEN}Starting PHP-FPM...${NC}"
-    php-fpm -FR
-fi
+echo -e "${GREEN}Starting PHP-FPM...${NC}"
+php-fpm -FR

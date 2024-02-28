@@ -69,13 +69,7 @@ encrypted_password=$(openssl passwd -apr1 "$NETDATA_PASS")
 echo "$NETDATA_USR:$encrypted_password" >> /etc/nginx/.htpasswd
 
 # ###############################################################################################
+
 # Start nginx
-if pgrep nginx > /dev/null
-then
-    echo -e "${YELLOW}Nginx is already running${NC}"
-    echo -e "${GREEN}Reloading nginx...${NC}"
-    nginx -s reload
-else
-    echo -e "${GREEN}Starting nginx...${NC}"
-    nginx -g "daemon off;"
-fi
+echo -e "${GREEN}Starting nginx...${NC}"
+nginx -g "daemon off;"
