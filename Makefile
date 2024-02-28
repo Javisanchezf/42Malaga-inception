@@ -103,10 +103,10 @@ clean: down
 	@rm -rf $(VOLUME_REF) && echo -e "$(GREEN)✔$(DEFAULT) Symlink: $(GREEN)Deleted$(DEFAULT)"
 
 host:
-	@if ! grep -q "$(DOMAIN_NAME)" /etc/hosts || ! grep -q "www.$(DOMAIN_NAME)" /etc/hosts || ! grep -q "web.$(DOMAIN_NAME)" /etc/hosts || ! grep -q "adminer.$(DOMAIN_NAME)" /etc/hosts ; then \
+	@if ! grep -q "$(DOMAIN_NAME)" /etc/hosts || ! grep -q "www.$(DOMAIN_NAME)" /etc/hosts || ! grep -q "web.$(DOMAIN_NAME)" /etc/hosts || ! grep -q "adminer.$(DOMAIN_NAME)" /etc/hosts || ! grep -q "netdata.$(DOMAIN_NAME)" /etc/hosts ; then \
 		echo -e "$(RED)✘$(DEFAULT) Hosts: $(RED)Not found$(DEFAULT)" && \
 		echo -e "$(GREEN)Adding $(DOMAIN_NAME) to /etc/hosts...$(DEFAULT)" && \
-        echo "127.0.0.1 $(DOMAIN_NAME) www.$(DOMAIN_NAME) web.$(DOMAIN_NAME) adminer.$(DOMAIN_NAME)" >> /etc/hosts; \
+        echo "127.0.0.1 $(DOMAIN_NAME) www.$(DOMAIN_NAME) web.$(DOMAIN_NAME) adminer.$(DOMAIN_NAME) netdata.$(DOMAIN_NAME)" >> /etc/hosts && \
         echo -e "$(GREEN)✔$(DEFAULT) Hosts: $(GREEN)Updated$(DEFAULT)"; \
     else \
         echo -e "$(GREEN)✔$(DEFAULT) Hosts: $(GREEN)Already up-to-date$(DEFAULT)"; \

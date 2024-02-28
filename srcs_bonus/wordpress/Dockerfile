@@ -49,4 +49,4 @@ RUN rm -f /var/cache/apk/*
 # Expose the port for the PHP-FPM service
 EXPOSE 9000
 
-ENTRYPOINT ["/run.sh"]
+ENTRYPOINT ["./run.sh"]

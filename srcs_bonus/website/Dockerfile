@@ -19,4 +19,4 @@ COPY media web_media
 RUN rm -f /var/cache/apk/*
 
 # Command to keep the container running in the foreground
-ENTRYPOINT ["/run.sh"]
+ENTRYPOINT ["./run.sh"]
